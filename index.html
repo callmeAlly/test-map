@@ -53,6 +53,34 @@
             transition: opacity 0.5s ease-in-out, filter 0.3s ease-in-out;
         }
 
+        .poi-tooltip, .sync-tooltip {
+            background: rgba(0, 0, 0, 0.8);
+            color: white;
+            font-family: "Jura";
+            font-size: 14px;
+            padding: 5px 10px;
+            border-radius: 5px;
+            border: 1px solid white;
+        }
+        
+        .poi-tooltip::before {
+            border-top-color: rgba(255, 255, 255, 0) !important; /* Change arrow color */
+            border-width: 6px; /* Adjust arrow size */
+        }
+
+        .poi-tooltip-second {
+            background: rgba(0, 0, 0, 0.8);
+            color: white;
+            font-family: "Jura";
+            padding: 5px 10px;
+            border-radius: 5px;
+        }
+
+        .poi-tooltip-second::before {
+            border-bottom-color: rgba(255, 255, 255, 0) !important; /* Change arrow color */
+            border-width: 6px; /* Adjust arrow size */
+        }
+
         /* reenable for web deployment*/
         
         @font-face {
@@ -104,7 +132,6 @@
             src: url("fonts/Sarpanch-Regular.ttf") format("truetype"),
             url("fonts/Sarpanch-Medium.ttf") format("truetype");
         }
-        
 
 
     </style>
@@ -332,6 +359,13 @@
     var poiIcons = {
         "sync": L.icon({
             iconUrl: 'images/icons/sync.png',
+            iconSize: [20, 20],  // Size of the icon
+            iconAnchor: [10, 10], // Anchor point (center)
+            popupAnchor: [0, -32] // Position relative to marker
+        }),
+
+        "checkpoint": L.icon({
+            iconUrl: 'images/icons/checkpoints.png',
             iconSize: [20, 20],  // Size of the icon
             iconAnchor: [10, 10], // Anchor point (center)
             popupAnchor: [0, -32] // Position relative to marker
@@ -1580,7 +1614,10 @@
 
     // Define POIs with their positions and sidebar content
     var poi = [
-        
+
+        ];
+
+    var trials = [
         //trials
             //downtown
         {
@@ -1854,6 +1891,7 @@
         {
             id: "ascension",
             position: transCoord(4959,2551),
+            goalPosition: transCoord(5095,2695),
             icon: poiIcons["advancedTrial"],
             title: `<span style="color: white; font-family: 'Jura'; font-size: 24px; font-weight: normal;">Ascension</span>`,
             content: `
@@ -1948,6 +1986,9 @@
                     <span style="color: white; font-family: 'Jura'; font-size: 18px; font-weight: 300;"> 24.000<br></span></p>
             `
         },
+    ];
+
+    var challenges = [
         //challenges
             //downtown
         {
@@ -2104,8 +2145,6 @@
         }
     ];
 
-
-
     var sidebarContents = {
         //districts
         "fragment": {
@@ -2203,27 +2242,143 @@
 
 
     let selectedPOI = null;
+    let goalMarker = null;
 
     let syncStore = [];
     // Function to add POI markers
-    syncs.forEach(syncs => {
-        var marker = L.marker(syncs.position, { icon: syncs.icon }).addTo(map).setZIndexOffset(8000);
-        console.log('p'+syncs.position);
-        syncStore.push({marker, id: syncs.id});
+    syncs.forEach(sync => {
+        var marker = L.marker(sync.position, { icon: sync.icon }).addTo(map).setZIndexOffset(8000).bindTooltip(sync.title, { 
+            permanent: false,   // Show only on hover
+            direction: "top",   // Position above the marker
+            offset: [0, -10],   // Adjust the position slightly
+            opacity: 0.9,
+            className: "sync-tooltip" // Custom styling
+        });
+        console.log('p'+sync.position);
+        syncStore.push({marker, id: sync.id});
         // Add click event to open sidebar
         marker.on('click', function () {
-            updateSelectedPOI({marker, id: syncs.id});
-            document.getElementById('sidebar-title').innerHTML = syncs.title;
-            document.getElementById('sidebar-content').innerHTML = syncs.content;
+            updateSelectedPOI({marker, id: sync.id});
+            document.getElementById('sidebar-title').innerHTML = sync.title;
+            document.getElementById('sidebar-content').innerHTML = sync.content;
             //document.getElementById("sidebar").style.right = "0px"; // Slide out 
+        });
+    });
+
+    let trialStore = [];
+    trials.forEach(trial => {
+        var marker = L.marker(trial.position, { icon: trial.icon }).addTo(map).setZIndexOffset(9000).bindTooltip(trial.title, { 
+            permanent: false,   // Show only on hover
+            direction: "top",   // Position above the marker
+            offset: [0, -10],   // Adjust the position slightly
+            opacity: 0.9,
+            className: "poi-tooltip" // Custom styling
+        });
+        var secondTooltip = L.tooltip({
+            direction: "bottom",
+            className: "poi-tooltip-second",
+            offset: L.point(0, 10)
+        })
+        .setContent(trial.content);
+
+
+        console.log('p'+trial.position);
+        trialStore.push({marker, id: trial.id});
+
+        //second tooltip
+        marker.on("mouseover", function() {
+            secondTooltip.setLatLng(marker.getLatLng());
+            map.addLayer(secondTooltip);
+        });
+
+        // hide second tooltip
+        marker.on("mouseout", function() {
+            map.removeLayer(secondTooltip);
+        });
+
+        // Add click event to open sidebar
+        marker.on('click', function () {
+            updateSelectedPOI({marker, id: trial.id});
+            document.getElementById('sidebar-title').innerHTML = trial.title;
+            document.getElementById('sidebar-content').innerHTML = trial.content;
+
+            if (trial.goalPosition) {
+                if (goalMarker) map.removeLayer(goalMarker); // Remove existing goal marker if present
+                goalMarker = L.marker(trial.goalPosition, { icon: poiIcons["checkpoint"] }).addTo(map);
+            }
+
+        });
+    });
+
+    let challengeStore = [];
+    challenges.forEach(challenge => {
+        var marker = L.marker(challenge.position, { icon: challenge.icon }).addTo(map).setZIndexOffset(9000).bindTooltip(challenge.title, { 
+            permanent: false,   // Show only on hover
+            direction: "top",   // Position above the marker
+            offset: [0, -10],   // Adjust the position slightly
+            opacity: 0.9,
+            className: "poi-tooltip" // Custom styling
+        });
+        var secondTooltip = L.tooltip({
+            direction: "bottom",
+            className: "poi-tooltip-second",
+            offset: L.point(0, 10)
+        })
+        .setContent(challenge.content);
+
+
+        console.log('p'+challenge.position);
+        challengeStore.push({marker, id: challenge.id});
+
+        //second tooltip
+        marker.on("mouseover", function() {
+            secondTooltip.setLatLng(marker.getLatLng());
+            map.addLayer(secondTooltip);
+        });
+
+        // hide second tooltip
+        marker.on("mouseout", function() {
+            map.removeLayer(secondTooltip);
+        });
+
+        // Add click event to open sidebar
+        marker.on('click', function () {
+            updateSelectedPOI({marker, id: challenge.id});
+            document.getElementById('sidebar-title').innerHTML = challenge.title;
+            document.getElementById('sidebar-content').innerHTML = challenge.content;
         });
     });
 
     let poiStore = [];
     poi.forEach(poi => {
-        var marker = L.marker(poi.position, { icon: poi.icon }).addTo(map).setZIndexOffset(9000);
+        var marker = L.marker(poi.position, { icon: poi.icon }).addTo(map).setZIndexOffset(9000).bindTooltip(poi.title, { 
+            permanent: false,   // Show only on hover
+            direction: "top",   // Position above the marker
+            offset: [0, -10],   // Adjust the position slightly
+            opacity: 0.9,
+            className: "poi-tooltip" // Custom styling
+        });
+        var secondTooltip = L.tooltip({
+            direction: "bottom",
+            className: "poi-tooltip-second",
+            offset: L.point(0, 10)
+        })
+        .setContent(poi.content);
+
+
         console.log('p'+poi.position);
         poiStore.push({marker, id: poi.id});
+
+        //second tooltip
+        marker.on("mouseover", function() {
+            secondTooltip.setLatLng(marker.getLatLng());
+            map.addLayer(secondTooltip);
+        });
+
+        // hide second tooltip
+        marker.on("mouseout", function() {
+            map.removeLayer(secondTooltip);
+        });
 
         // Add click event to open sidebar
         marker.on('click', function () {
@@ -2328,7 +2483,7 @@
         });
     };
 
-    function updatePOIOpacity() {
+    function updateTrialOpacity() {
         let zoomLevel = map.getZoom();
         let opacity = 0;
 
@@ -2336,6 +2491,42 @@
         //if (opacity>1) {opacity=1;}
         if (zoomLevel >= -1.2) {opacity=1;}
         console.log('trials: '+zoomLevel+','+opacity);
+        trialStore.forEach(({marker}) => {
+            marker.setOpacity(opacity);
+            if (opacity === 1) {
+                marker._icon.style.pointerEvents = "auto";
+            } else {
+                marker._icon.style.pointerEvents = "none";
+            }
+        });
+    };
+
+    function updateChallengeOpacity() {
+        let zoomLevel = map.getZoom();
+        let opacity = 0;
+
+        //opacity= (5/4) * zoomLevel + (5/2);
+        //if (opacity>1) {opacity=1;}
+        if (zoomLevel >= -1.2) {opacity=1;}
+        console.log('challenges: '+zoomLevel+','+opacity);
+        challengeStore.forEach(({marker}) => {
+            marker.setOpacity(opacity);
+            if (opacity === 1) {
+                marker._icon.style.pointerEvents = "auto";
+            } else {
+                marker._icon.style.pointerEvents = "none";
+            }
+        });
+    };
+
+    function updatePOIOpacity() {
+        let zoomLevel = map.getZoom();
+        let opacity = 0;
+
+        //opacity= (5/4) * zoomLevel + (5/2);
+        //if (opacity>1) {opacity=1;}
+        if (zoomLevel >= -1.2) {opacity=1;}
+        console.log('pois: '+zoomLevel+','+opacity);
         poiStore.forEach(({marker}) => {
             marker.setOpacity(opacity);
             if (opacity === 1) {
@@ -2345,6 +2536,8 @@
             }
         });
     };
+
+
 
     function updateSelectedPOI(newPOI){
         //console.log("newPOI"+newPOI.id+"selPOI"+selectedPOI.id);
@@ -2367,6 +2560,7 @@
     function deselectPOI() {
         selectedPOI.marker._icon.style.filter = "brightness(1)";
         selectedPOI = null;
+        if (goalMarker) map.removeLayer(goalMarker);
     }
 
     map.on("zoom", function () {
@@ -2378,12 +2572,16 @@
     });
 
     map.on("zoomend", function () {
-        updatePOIOpacity();
         updateSyncOpacity();
+        updateTrialOpacity();
+        updateChallengeOpacity();
+        updatePOIOpacity();
     });
 
-    updatePOIOpacity();
     updateSyncOpacity();
+    updateTrialOpacity();
+    updateChallengeOpacity();
+    updatePOIOpacity();
     
 
     map.options.wheelPxPerZoomLevel = 120; // Adjust for finer control (default is 60)
