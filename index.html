@@ -59,7 +59,7 @@
             font-family: "Jura";
             font-size: 14px;
             padding: 5px 10px;
-            border-radius: 5px;
+            border-radius: 8px;
             border: 1px solid white;
         }
         
@@ -72,8 +72,11 @@
             background: rgba(0, 0, 0, 0.8);
             color: white;
             font-family: "Jura";
-            padding: 5px 10px;
-            border-radius: 5px;
+            padding: 8px 8px 3px 8px;
+            border-radius: 8px;
+            /*line-height: 1;*/
+            margin: 0;
+            box-sizing: border-box;
         }
 
         .poi-tooltip-second::before {
@@ -132,6 +135,7 @@
             src: url("fonts/Sarpanch-Regular.ttf") format("truetype"),
             url("fonts/Sarpanch-Medium.ttf") format("truetype");
         }
+        
 
 
     </style>
@@ -366,6 +370,13 @@
 
         "checkpoint": L.icon({
             iconUrl: 'images/icons/checkpoints.png',
+            iconSize: [20, 20],  // Size of the icon
+            iconAnchor: [10, 10], // Anchor point (center)
+            popupAnchor: [0, -32] // Position relative to marker
+        }),
+
+        "goal": L.icon({
+            iconUrl: 'images/icons/goal.png',
             iconSize: [20, 20],  // Size of the icon
             iconAnchor: [10, 10], // Anchor point (center)
             popupAnchor: [0, -32] // Position relative to marker
@@ -1341,7 +1352,8 @@
             title: `<span style="color: white; font-family: 'Jura'; font-size: 24px; font-weight: normal;">Saorise</span>`,
             content: `
                 <img src="images/icons/lol.png" alt="Temple" style="width: 100%; border-radius: 8px; margin-bottom: 10px;">
-                <p><span style="color: white; font-family: 'Source Sans 3'; font-weight: 300;">You explain it to me.</span></p>
+                <p><span style="color: white; font-family: 'Source Sans 3'; font-weight: 300;">And I'll hate you as long as I want,
+                    but that doesn't mean I won't cry when you're gone.</span></p>
             `
         },
         {
@@ -1623,12 +1635,13 @@
         {
             id: "crystal",
             position: transCoord(4320,2070),
+            goalPosition: [transCoord(4001,2054)],
             icon: poiIcons["basicTrial"],
             title: `<span style="color: white; font-family: 'Jura'; font-size: 24px; font-weight: normal;">Crystal</span>`,
             content: `
-                <img src="images/trials/crystal.png" alt="Crystal" style="width: 100%; border-radius: 8px; margin-bottom: 10px;">
-                <p><span style="color: white; font-family: 'Source Sans 3'; font-weight: 300;">Times:<br></span></p>
-                <p>
+                <img src="images/trials/crystal.png" alt="Crystal" style="width: 100%; border-radius: 8px; margin-bottom: 0px;">
+                <span style="color: white; font-family: 'Source Sans 3'; font-weight: 300;"><br>Times:<br></span>
+                
                     <img src="images/icons/platinum.png" width="18" style="position: relative; top: 2px;">
                     <span style="color: white; font-family: 'Jura'; font-size: 18px; font-weight: 300;"> 10.500<br></span>
                     <img src="images/icons/gold.png" width="18" style="position: relative; top: 2px;">
@@ -1636,18 +1649,18 @@
                     <img src="images/icons/silver.png" width="18" style="position: relative; top: 2px;">
                     <span style="color: white; font-family: 'Jura'; font-size: 18px; font-weight: 300;"> 20.000<br></span>
                     <img src="images/icons/bronze.png" width="18" style="position: relative; top: 2px;">
-                    <span style="color: white; font-family: 'Jura'; font-size: 18px; font-weight: 300;"> 25.000<br></span></p>
-            `
+                    <span style="color: white; font-family: 'Jura'; font-size: 18px; font-weight: 300;"> 25.000</span>`
         },
         {
             id: "genesis",
             position: transCoord(4190,2008),
+            goalPosition: [transCoord(4252,2252)],
             icon: poiIcons["moderateTrial"],
             title: `<span style="color: white; font-family: 'Jura'; font-size: 24px; font-weight: normal;">Genesis</span>`,
             content: `
-                <img src="images/trials/genesis.png" alt="Genesis" style="width: 100%; border-radius: 8px; margin-bottom: 10px;">
-                <p><span style="color: white; font-family: 'Source Sans 3'; font-weight: 300;">Times:<br></span></p>
-                <p>
+                <img src="images/trials/genesis.png" alt="Genesis" style="width: 100%; border-radius: 8px; margin-bottom: 0px;">
+                <span style="color: white; font-family: 'Source Sans 3'; font-weight: 300;"><br>Times:<br></span>
+                
                     <img src="images/icons/platinum.png" width="18" style="position: relative; top: 2px;">
                     <span style="color: white; font-family: 'Jura'; font-size: 18px; font-weight: 300;"> 19.000<br></span>
                     <img src="images/icons/gold.png" width="18" style="position: relative; top: 2px;">
@@ -1655,18 +1668,18 @@
                     <img src="images/icons/silver.png" width="18" style="position: relative; top: 2px;">
                     <span style="color: white; font-family: 'Jura'; font-size: 18px; font-weight: 300;"> 45.000<br></span>
                     <img src="images/icons/bronze.png" width="18" style="position: relative; top: 2px;">
-                    <span style="color: white; font-family: 'Jura'; font-size: 18px; font-weight: 300;"> 80.000<br></span></p>
-            `
+                    <span style="color: white; font-family: 'Jura'; font-size: 18px; font-weight: 300;"> 80.000</span>`
         },
         {
             id: "solar",
             position: transCoord(4005,2415),
+            goalPosition: [transCoord(3966,2889)],
             icon: poiIcons["moderateTrial"],
             title: `<span style="color: white; font-family: 'Jura'; font-size: 24px; font-weight: normal;">Solar</span>`,
             content: `
-                <img src="images/trials/solar.png" alt="Solar" style="width: 100%; border-radius: 8px; margin-bottom: 10px;">
-                <p><span style="color: white; font-family: 'Source Sans 3'; font-weight: 300;">Times:<br></span></p>
-                <p>
+                <img src="images/trials/solar.png" alt="Solar" style="width: 100%; border-radius: 8px; margin-bottom: 0px;">
+                <span style="color: white; font-family: 'Source Sans 3'; font-weight: 300;"><br>Times:<br></span>
+                
                     <img src="images/icons/platinum.png" width="18" style="position: relative; top: 2px;">
                     <span style="color: white; font-family: 'Jura'; font-size: 18px; font-weight: 300;"> 19.500<br></span>
                     <img src="images/icons/gold.png" width="18" style="position: relative; top: 2px;">
@@ -1674,18 +1687,18 @@
                     <img src="images/icons/silver.png" width="18" style="position: relative; top: 2px;">
                     <span style="color: white; font-family: 'Jura'; font-size: 18px; font-weight: 300;"> 32.000<br></span>
                     <img src="images/icons/bronze.png" width="18" style="position: relative; top: 2px;">
-                    <span style="color: white; font-family: 'Jura'; font-size: 18px; font-weight: 300;"> 40.000<br></span></p>
-            `
+                    <span style="color: white; font-family: 'Jura'; font-size: 18px; font-weight: 300;"> 40.000</span>`
         },
         {
             id: "glass",
             position: transCoord(4455,2165),
+            goalPosition: [transCoord(4682,2403)],
             icon: poiIcons["toughTrial"],
             title: `<span style="color: white; font-family: 'Jura'; font-size: 24px; font-weight: normal;">Glass</span>`,
             content: `
-                <img src="images/trials/glass.png" alt="Glass" style="width: 100%; border-radius: 8px; margin-bottom: 10px;">
-                <p><span style="color: white; font-family: 'Source Sans 3'; font-weight: 300;">Times:<br></span></p>
-                <p>
+                <img src="images/trials/glass.png" alt="Glass" style="width: 100%; border-radius: 8px; margin-bottom: 0px;">
+                <span style="color: white; font-family: 'Source Sans 3'; font-weight: 300;"><br>Times:<br></span>
+                
                     <img src="images/icons/platinum.png" width="18" style="position: relative; top: 2px;">
                     <span style="color: white; font-family: 'Jura'; font-size: 18px; font-weight: 300;"> 10.250<br></span>
                     <img src="images/icons/gold.png" width="18" style="position: relative; top: 2px;">
@@ -1693,18 +1706,18 @@
                     <img src="images/icons/silver.png" width="18" style="position: relative; top: 2px;">
                     <span style="color: white; font-family: 'Jura'; font-size: 18px; font-weight: 300;"> 16.000<br></span>
                     <img src="images/icons/bronze.png" width="18" style="position: relative; top: 2px;">
-                    <span style="color: white; font-family: 'Jura'; font-size: 18px; font-weight: 300;"> 20.000<br></span></p>
-            `
+                    <span style="color: white; font-family: 'Jura'; font-size: 18px; font-weight: 300;"> 20.000</span>`
         },
         {
             id: "riser",
             position: transCoord(4617,2437),
+            goalPosition: [transCoord(4292,2488)],
             icon: poiIcons["toughTrial"],
             title: `<span style="color: white; font-family: 'Jura'; font-size: 24px; font-weight: normal;">Riser</span>`,
             content: `
-                <img src="images/trials/riser.png" alt="Riser" style="width: 100%; border-radius: 8px; margin-bottom: 10px;">
-                <p><span style="color: white; font-family: 'Source Sans 3'; font-weight: 300;">Times:<br></span></p>
-                <p>
+                <img src="images/trials/riser.png" alt="Riser" style="width: 100%; border-radius: 8px; margin-bottom: 0px;">
+                <span style="color: white; font-family: 'Source Sans 3'; font-weight: 300;"><br>Times:<br></span>
+                
                     <img src="images/icons/platinum.png" width="18" style="position: relative; top: 2px;">
                     <span style="color: white; font-family: 'Jura'; font-size: 18px; font-weight: 300;"> 10.750<br></span>
                     <img src="images/icons/gold.png" width="18" style="position: relative; top: 2px;">
@@ -1712,18 +1725,18 @@
                     <img src="images/icons/silver.png" width="18" style="position: relative; top: 2px;">
                     <span style="color: white; font-family: 'Jura'; font-size: 18px; font-weight: 300;"> 20.000<br></span>
                     <img src="images/icons/bronze.png" width="18" style="position: relative; top: 2px;">
-                    <span style="color: white; font-family: 'Jura'; font-size: 18px; font-weight: 300;"> 25.000<br></span></p>
-            `
+                    <span style="color: white; font-family: 'Jura'; font-size: 18px; font-weight: 300;"> 25.000</span>`
         },
         {
             id: "vestibule",
             position: transCoord(4127,1757),
+            goalPosition: [transCoord(3818,1703)],
             icon: poiIcons["advancedTrial"],
             title: `<span style="color: white; font-family: 'Jura'; font-size: 24px; font-weight: normal;">Vestibule</span>`,
             content: `
-                <img src="images/trials/vestibule.png" alt="Vestibule" style="width: 100%; border-radius: 8px; margin-bottom: 10px;">
-                <p><span style="color: white; font-family: 'Source Sans 3'; font-weight: 300;">Times:<br></span></p>
-                <p>
+                <img src="images/trials/vestibule.png" alt="Vestibule" style="width: 100%; border-radius: 8px; margin-bottom: 0px;">
+                <span style="color: white; font-family: 'Source Sans 3'; font-weight: 300;"><br>Times:<br></span>
+                
                     <img src="images/icons/platinum.png" width="18" style="position: relative; top: 2px;">
                     <span style="color: white; font-family: 'Jura'; font-size: 18px; font-weight: 300;"> 10.500<br></span>
                     <img src="images/icons/gold.png" width="18" style="position: relative; top: 2px;">
@@ -1731,19 +1744,19 @@
                     <img src="images/icons/silver.png" width="18" style="position: relative; top: 2px;">
                     <span style="color: white; font-family: 'Jura'; font-size: 18px; font-weight: 300;"> 18.000<br></span>
                     <img src="images/icons/bronze.png" width="18" style="position: relative; top: 2px;">
-                    <span style="color: white; font-family: 'Jura'; font-size: 18px; font-weight: 300;"> 24.000<br></span></p>
-            `
+                    <span style="color: white; font-family: 'Jura'; font-size: 18px; font-weight: 300;"> 24.000</span>`
         },
             //dirwik
         {
             id: "celsius",
             position: transCoord(3218,1670),
+            goalPosition: [transCoord(3130,2018)],
             icon: poiIcons["moderateTrial"],
             title: `<span style="color: white; font-family: 'Jura'; font-size: 24px; font-weight: normal;">Celsius</span>`,
             content: `
-                <img src="images/trials/celsius.png" alt="Celsius" style="width: 100%; border-radius: 8px; margin-bottom: 10px;">
-                <p><span style="color: white; font-family: 'Source Sans 3'; font-weight: 300;">Times:<br></span></p>
-                <p>
+                <img src="images/trials/celsius.png" alt="Celsius" style="width: 100%; border-radius: 8px; margin-bottom: 0px;">
+                <span style="color: white; font-family: 'Source Sans 3'; font-weight: 300;"><br>Times:<br></span>
+                
                     <img src="images/icons/platinum.png" width="18" style="position: relative; top: 2px;">
                     <span style="color: white; font-family: 'Jura'; font-size: 18px; font-weight: 300;"> 12.000<br></span>
                     <img src="images/icons/gold.png" width="18" style="position: relative; top: 2px;">
@@ -1751,18 +1764,18 @@
                     <img src="images/icons/silver.png" width="18" style="position: relative; top: 2px;">
                     <span style="color: white; font-family: 'Jura'; font-size: 18px; font-weight: 300;"> 20.000<br></span>
                     <img src="images/icons/bronze.png" width="18" style="position: relative; top: 2px;">
-                    <span style="color: white; font-family: 'Jura'; font-size: 18px; font-weight: 300;"> 25.000<br></span></p>
-            `
+                    <span style="color: white; font-family: 'Jura'; font-size: 18px; font-weight: 300;"> 25.000</span>`
         },
         {
             id: "circulation",
             position: transCoord(2985,1497),
+            goalPosition: [transCoord(2591,1641)],
             icon: poiIcons["toughTrial"],
             title: `<span style="color: white; font-family: 'Jura'; font-size: 24px; font-weight: normal;">Circulation</span>`,
             content: `
-                <img src="images/trials/circulation.png" alt="Circulation" style="width: 100%; border-radius: 8px; margin-bottom: 10px;">
-                <p><span style="color: white; font-family: 'Source Sans 3'; font-weight: 300;">Times:<br></span></p>
-                <p>
+                <img src="images/trials/circulation.png" alt="Circulation" style="width: 100%; border-radius: 8px; margin-bottom: 0px;">
+                <span style="color: white; font-family: 'Source Sans 3'; font-weight: 300;"><br>Times:<br></span>
+                
                     <img src="images/icons/platinum.png" width="18" style="position: relative; top: 2px;">
                     <span style="color: white; font-family: 'Jura'; font-size: 18px; font-weight: 300;"> 14.000<br></span>
                     <img src="images/icons/gold.png" width="18" style="position: relative; top: 2px;">
@@ -1770,18 +1783,18 @@
                     <img src="images/icons/silver.png" width="18" style="position: relative; top: 2px;">
                     <span style="color: white; font-family: 'Jura'; font-size: 18px; font-weight: 300;"> 25.000<br></span>
                     <img src="images/icons/bronze.png" width="18" style="position: relative; top: 2px;">
-                    <span style="color: white; font-family: 'Jura'; font-size: 18px; font-weight: 300;"> 35.000<br></span></p>
-            `
+                    <span style="color: white; font-family: 'Jura'; font-size: 18px; font-weight: 300;"> 35.000</span>`
         },
         {
             id: "flow",
             position: transCoord(2606,1498),
+            goalPosition: [transCoord(2615,2087)],
             icon: poiIcons["toughTrial"],
             title: `<span style="color: white; font-family: 'Jura'; font-size: 24px; font-weight: normal;">Flow</span>`,
             content: `
-                <img src="images/trials/flow.png" alt="Flow" style="width: 100%; border-radius: 8px; margin-bottom: 10px;">
-                <p><span style="color: white; font-family: 'Source Sans 3'; font-weight: 300;">Times:<br></span></p>
-                <p>
+                <img src="images/trials/flow.png" alt="Flow" style="width: 100%; border-radius: 8px; margin-bottom: 0px;">
+                <span style="color: white; font-family: 'Source Sans 3'; font-weight: 300;"><br>Times:<br></span>
+                
                     <img src="images/icons/platinum.png" width="18" style="position: relative; top: 2px;">
                     <span style="color: white; font-family: 'Jura'; font-size: 18px; font-weight: 300;"> 16.000<br></span>
                     <img src="images/icons/gold.png" width="18" style="position: relative; top: 2px;">
@@ -1789,18 +1802,18 @@
                     <img src="images/icons/silver.png" width="18" style="position: relative; top: 2px;">
                     <span style="color: white; font-family: 'Jura'; font-size: 18px; font-weight: 300;"> 26.000<br></span>
                     <img src="images/icons/bronze.png" width="18" style="position: relative; top: 2px;">
-                    <span style="color: white; font-family: 'Jura'; font-size: 18px; font-weight: 300;"> 32.000<br></span></p>
-            `
+                    <span style="color: white; font-family: 'Jura'; font-size: 18px; font-weight: 300;"> 32.000</span>`
         },
         {
             id: "martyr",
             position: transCoord(2597,1312),
+            goalPosition: [transCoord(2952,1425)],
             icon: poiIcons["toughTrial"],
             title: `<span style="color: white; font-family: 'Jura'; font-size: 24px; font-weight: normal;">Martyr</span>`,
             content: `
-                <img src="images/trials/martyr.png" alt="Martyr" style="width: 100%; border-radius: 8px; margin-bottom: 10px;">
-                <p><span style="color: white; font-family: 'Source Sans 3'; font-weight: 300;">Times:<br></span></p>
-                <p>
+                <img src="images/trials/martyr.png" alt="Martyr" style="width: 100%; border-radius: 8px; margin-bottom: 0px;">
+                <span style="color: white; font-family: 'Source Sans 3'; font-weight: 300;"><br>Times:<br></span>
+                
                     <img src="images/icons/platinum.png" width="18" style="position: relative; top: 2px;">
                     <span style="color: white; font-family: 'Jura'; font-size: 18px; font-weight: 300;"> 12.500<br></span>
                     <img src="images/icons/gold.png" width="18" style="position: relative; top: 2px;">
@@ -1808,18 +1821,18 @@
                     <img src="images/icons/silver.png" width="18" style="position: relative; top: 2px;">
                     <span style="color: white; font-family: 'Jura'; font-size: 18px; font-weight: 300;"> 30.000<br></span>
                     <img src="images/icons/bronze.png" width="18" style="position: relative; top: 2px;">
-                    <span style="color: white; font-family: 'Jura'; font-size: 18px; font-weight: 300;"> 35.000<br></span></p>
-            `
+                    <span style="color: white; font-family: 'Jura'; font-size: 18px; font-weight: 300;"> 35.000</span>`
         },
         {
             id: "sawdust",
             position: transCoord(3347,4151),
+            goalPosition: [transCoord(2934,4316)],
             icon: poiIcons["advancedTrial"],
             title: `<span style="color: white; font-family: 'Jura'; font-size: 24px; font-weight: normal;">Sawdust</span>`,
             content: `
-                <img src="images/trials/sawdust.png" alt="Sawdust" style="width: 100%; border-radius: 8px; margin-bottom: 10px;">
-                <p><span style="color: white; font-family: 'Source Sans 3'; font-weight: 300;">Times:<br></span></p>
-                <p>
+                <img src="images/trials/sawdust.png" alt="Sawdust" style="width: 100%; border-radius: 8px; margin-bottom: 0px;">
+                <span style="color: white; font-family: 'Source Sans 3'; font-weight: 300;"><br>Times:<br></span>
+                
                     <img src="images/icons/platinum.png" width="18" style="position: relative; top: 2px;">
                     <span style="color: white; font-family: 'Jura'; font-size: 18px; font-weight: 300;"> 16.500<br></span>
                     <img src="images/icons/gold.png" width="18" style="position: relative; top: 2px;">
@@ -1827,18 +1840,18 @@
                     <img src="images/icons/silver.png" width="18" style="position: relative; top: 2px;">
                     <span style="color: white; font-family: 'Jura'; font-size: 18px; font-weight: 300;"> 35.000<br></span>
                     <img src="images/icons/bronze.png" width="18" style="position: relative; top: 2px;">
-                    <span style="color: white; font-family: 'Jura'; font-size: 18px; font-weight: 300;"> 40.000<br></span></p>
-            `
+                    <span style="color: white; font-family: 'Jura'; font-size: 18px; font-weight: 300;"> 40.000</span>`
         },
         {
             id: "neonBold",
             position: transCoord(3150,3968),
+            goalPosition: [transCoord(3130,3468)],
             icon: poiIcons["insaneTrial"],
             title: `<span style="color: white; font-family: 'Jura'; font-size: 24px; font-weight: normal;">Neon Bold</span>`,
             content: `
-                <img src="images/trials/neonBold.png" alt="Neon Bold" style="width: 100%; border-radius: 8px; margin-bottom: 10px;">
-                <p><span style="color: white; font-family: 'Source Sans 3'; font-weight: 300;">Times:<br></span></p>
-                <p>
+                <img src="images/trials/neonBold.png" alt="Neon Bold" style="width: 100%; border-radius: 8px; margin-bottom: 0px;">
+                <span style="color: white; font-family: 'Source Sans 3'; font-weight: 300;"><br>Times:<br></span>
+                
                     <img src="images/icons/platinum.png" width="18" style="position: relative; top: 2px;">
                     <span style="color: white; font-family: 'Jura'; font-size: 18px; font-weight: 300;"> 20.000<br></span>
                     <img src="images/icons/gold.png" width="18" style="position: relative; top: 2px;">
@@ -1846,19 +1859,19 @@
                     <img src="images/icons/silver.png" width="18" style="position: relative; top: 2px;">
                     <span style="color: white; font-family: 'Jura'; font-size: 18px; font-weight: 300;"> 35.000<br></span>
                     <img src="images/icons/bronze.png" width="18" style="position: relative; top: 2px;">
-                    <span style="color: white; font-family: 'Jura'; font-size: 18px; font-weight: 300;"> 40.000<br></span></p>
-            `
+                    <span style="color: white; font-family: 'Jura'; font-size: 18px; font-weight: 300;"> 40.000</span>`
         },
             //fragment
         {
             id: "faith",
             position: transCoord(5438,1563),
+            goalPosition: [transCoord(5412,1978)],
             icon: poiIcons["toughTrial"],
             title: `<span style="color: white; font-family: 'Jura'; font-size: 24px; font-weight: normal;">Faith</span>`,
             content: `
-                <img src="images/trials/faith.png" alt="Faith" style="width: 100%; border-radius: 8px; margin-bottom: 10px;">
-                <p><span style="color: white; font-family: 'Source Sans 3'; font-weight: 300;">Times:<br></span></p>
-                <p>
+                <img src="images/trials/faith.png" alt="Faith" style="width: 100%; border-radius: 8px; margin-bottom: 0px;">
+                <span style="color: white; font-family: 'Source Sans 3'; font-weight: 300;"><br>Times:<br></span>
+                
                     <img src="images/icons/platinum.png" width="18" style="position: relative; top: 2px;">
                     <span style="color: white; font-family: 'Jura'; font-size: 18px; font-weight: 300;"> 15.000<br></span>
                     <img src="images/icons/gold.png" width="18" style="position: relative; top: 2px;">
@@ -1866,18 +1879,18 @@
                     <img src="images/icons/silver.png" width="18" style="position: relative; top: 2px;">
                     <span style="color: white; font-family: 'Jura'; font-size: 18px; font-weight: 300;"> 25.000<br></span>
                     <img src="images/icons/bronze.png" width="18" style="position: relative; top: 2px;">
-                    <span style="color: white; font-family: 'Jura'; font-size: 18px; font-weight: 300;"> 30.000<br></span></p>
-            `
+                    <span style="color: white; font-family: 'Jura'; font-size: 18px; font-weight: 300;"> 30.000</span>`
         },
         {
             id: "needle",
             position: transCoord(4869,2539),
+            goalPosition: [transCoord(4907,2179)],
             icon: poiIcons["toughTrial"],
             title: `<span style="color: white; font-family: 'Jura'; font-size: 24px; font-weight: normal;">Needle</span>`,
             content: `
-                <img src="images/trials/needle.png" alt="Needle" style="width: 100%; border-radius: 8px; margin-bottom: 10px;">
-                <p><span style="color: white; font-family: 'Source Sans 3'; font-weight: 300;">Times:<br></span></p>
-                <p>
+                <img src="images/trials/needle.png" alt="Needle" style="width: 100%; border-radius: 8px; margin-bottom: 0px;">
+                <span style="color: white; font-family: 'Source Sans 3'; font-weight: 300;"><br>Times:<br></span>
+                
                     <img src="images/icons/platinum.png" width="18" style="position: relative; top: 2px;">
                     <span style="color: white; font-family: 'Jura'; font-size: 18px; font-weight: 300;"> 13.000<br></span>
                     <img src="images/icons/gold.png" width="18" style="position: relative; top: 2px;">
@@ -1885,19 +1898,18 @@
                     <img src="images/icons/silver.png" width="18" style="position: relative; top: 2px;">
                     <span style="color: white; font-family: 'Jura'; font-size: 18px; font-weight: 300;"> 20.000<br></span>
                     <img src="images/icons/bronze.png" width="18" style="position: relative; top: 2px;">
-                    <span style="color: white; font-family: 'Jura'; font-size: 18px; font-weight: 300;"> 30.000<br></span></p>
-            `
+                    <span style="color: white; font-family: 'Jura'; font-size: 18px; font-weight: 300;"> 30.000</span>`
         },
         {
             id: "ascension",
             position: transCoord(4959,2551),
-            goalPosition: transCoord(5095,2695),
+            goalPosition: [transCoord(5095,2695)],
             icon: poiIcons["advancedTrial"],
             title: `<span style="color: white; font-family: 'Jura'; font-size: 24px; font-weight: normal;">Ascension</span>`,
             content: `
-                <img src="images/trials/ascension.png" alt="Ascension" style="width: 100%; border-radius: 8px; margin-bottom: 10px;">
-                <p><span style="color: white; font-family: 'Source Sans 3'; font-weight: 300;">Times:<br></span></p>
-                <p>
+                <img src="images/trials/ascension.png" alt="Ascension" style="width: 100%; border-radius: 8px; margin-bottom: 0px;">
+                <span style="color: white; font-family: 'Source Sans 3'; font-weight: 300;"><br>Times:<br></span>
+                
                     <img src="images/icons/platinum.png" width="18" style="position: relative; top: 2px;">
                     <span style="color: white; font-family: 'Jura'; font-size: 18px; font-weight: 300;"> 12.000<br></span>
                     <img src="images/icons/gold.png" width="18" style="position: relative; top: 2px;">
@@ -1905,18 +1917,18 @@
                     <img src="images/icons/silver.png" width="18" style="position: relative; top: 2px;">
                     <span style="color: white; font-family: 'Jura'; font-size: 18px; font-weight: 300;"> 20.000<br></span>
                     <img src="images/icons/bronze.png" width="18" style="position: relative; top: 2px;">
-                    <span style="color: white; font-family: 'Jura'; font-size: 18px; font-weight: 300;"> 25.000<br></span></p>
-            `
+                    <span style="color: white; font-family: 'Jura'; font-size: 18px; font-weight: 300;"> 25.000</span>`
         },
         {
             id: "grip",
             position: transCoord(4550,2925),
+            goalPosition: [transCoord(5004,3168)],
             icon: poiIcons["advancedTrial"],
             title: `<span style="color: white; font-family: 'Jura'; font-size: 24px; font-weight: normal;">Grip</span>`,
             content: `
-                <img src="images/trials/grip.png" alt="Grip" style="width: 100%; border-radius: 8px; margin-bottom: 10px;">
-                <p><span style="color: white; font-family: 'Source Sans 3'; font-weight: 300;">Times:<br></span></p>
-                <p>
+                <img src="images/trials/grip.png" alt="Grip" style="width: 100%; border-radius: 8px; margin-bottom: 0px;">
+                <span style="color: white; font-family: 'Source Sans 3'; font-weight: 300;"><br>Times:<br></span>
+                
                     <img src="images/icons/platinum.png" width="18" style="position: relative; top: 2px;">
                     <span style="color: white; font-family: 'Jura'; font-size: 18px; font-weight: 300;"> 17.000<br></span>
                     <img src="images/icons/gold.png" width="18" style="position: relative; top: 2px;">
@@ -1924,18 +1936,18 @@
                     <img src="images/icons/silver.png" width="18" style="position: relative; top: 2px;">
                     <span style="color: white; font-family: 'Jura'; font-size: 18px; font-weight: 300;"> 24.000<br></span>
                     <img src="images/icons/bronze.png" width="18" style="position: relative; top: 2px;">
-                    <span style="color: white; font-family: 'Jura'; font-size: 18px; font-weight: 300;"> 35.000<br></span></p>
-            `
+                    <span style="color: white; font-family: 'Jura'; font-size: 18px; font-weight: 300;"> 35.000</span>`
         },
         {
             id: "umbrel",
             position: transCoord(4880,3495),
+            goalPosition: [transCoord(4456,3191)],
             icon: poiIcons["advancedTrial"],
             title: `<span style="color: white; font-family: 'Jura'; font-size: 24px; font-weight: normal;">Umbrel</span>`,
             content: `
-                <img src="images/trials/umbrel.png" alt="Umbrel" style="width: 100%; border-radius: 8px; margin-bottom: 10px;">
-                <p><span style="color: white; font-family: 'Source Sans 3'; font-weight: 300;">Times:<br></span></p>
-                <p>
+                <img src="images/trials/umbrel.png" alt="Umbrel" style="width: 100%; border-radius: 8px; margin-bottom: 0px;">
+                <span style="color: white; font-family: 'Source Sans 3'; font-weight: 300;"><br>Times:<br></span>
+                
                     <img src="images/icons/platinum.png" width="18" style="position: relative; top: 2px;">
                     <span style="color: white; font-family: 'Jura'; font-size: 18px; font-weight: 300;"> 21.000<br></span>
                     <img src="images/icons/gold.png" width="18" style="position: relative; top: 2px;">
@@ -1943,19 +1955,19 @@
                     <img src="images/icons/silver.png" width="18" style="position: relative; top: 2px;">
                     <span style="color: white; font-family: 'Jura'; font-size: 18px; font-weight: 300;"> 28.000<br></span>
                     <img src="images/icons/bronze.png" width="18" style="position: relative; top: 2px;">
-                    <span style="color: white; font-family: 'Jura'; font-size: 18px; font-weight: 300;"> 32.000<br></span></p>
-            `
+                    <span style="color: white; font-family: 'Jura'; font-size: 18px; font-weight: 300;"> 32.000</span>`
         },
             //skyarc
         {
             id: "fiber",
             position: transCoord(4746,3540),
+            goalPosition: [transCoord(4643,3934)],
             icon: poiIcons["toughTrial"],
             title: `<span style="color: white; font-family: 'Jura'; font-size: 24px; font-weight: normal;">Fiber</span>`,
             content: `
-                <img src="images/icons/lol.png" alt="Fiber" style="width: 100%; border-radius: 8px; margin-bottom: 10px;">
-                <p><span style="color: white; font-family: 'Source Sans 3'; font-weight: 300;">Times:<br></span></p>
-                <p>
+                <img src="images/icons/lol.png" alt="Fiber" style="width: 100%; border-radius: 8px; margin-bottom: 0px;">
+                <span style="color: white; font-family: 'Source Sans 3'; font-weight: 300;"><br>Times:<br></span>
+                
                     <img src="images/icons/platinum.png" width="18" style="position: relative; top: 2px;">
                     <span style="color: white; font-family: 'Jura'; font-size: 18px; font-weight: 300;"> 14.000<br></span>
                     <img src="images/icons/gold.png" width="18" style="position: relative; top: 2px;">
@@ -1963,19 +1975,19 @@
                     <img src="images/icons/silver.png" width="18" style="position: relative; top: 2px;">
                     <span style="color: white; font-family: 'Jura'; font-size: 18px; font-weight: 300;"> 25.000<br></span>
                     <img src="images/icons/bronze.png" width="18" style="position: relative; top: 2px;">
-                    <span style="color: white; font-family: 'Jura'; font-size: 18px; font-weight: 300;"> 30.000<br></span></p>
-            `
+                    <span style="color: white; font-family: 'Jura'; font-size: 18px; font-weight: 300;"> 30.000</span>`
         },
             //the mirror
         {
             id: "carbon",
             position: transCoord(5388,2695),
+            goalPosition: [transCoord(5659,2823)],
             icon: poiIcons["moderateTrial"],
             title: `<span style="color: white; font-family: 'Jura'; font-size: 24px; font-weight: normal;">Carbon</span>`,
             content: `
-                <img src="images/icons/lol.png" alt="Fiber" style="width: 100%; border-radius: 8px; margin-bottom: 10px;">
-                <p><span style="color: white; font-family: 'Source Sans 3'; font-weight: 300;">Times:<br></span></p>
-                <p>
+                <img src="images/icons/lol.png" alt="Fiber" style="width: 100%; border-radius: 8px; margin-bottom: 0px;">
+                <span style="color: white; font-family: 'Source Sans 3'; font-weight: 300;"><br>Times:<br></span>
+                
                     <img src="images/icons/platinum.png" width="18" style="position: relative; top: 2px;">
                     <span style="color: white; font-family: 'Jura'; font-size: 18px; font-weight: 300;"> 12.000<br></span>
                     <img src="images/icons/gold.png" width="18" style="position: relative; top: 2px;">
@@ -1983,8 +1995,7 @@
                     <img src="images/icons/silver.png" width="18" style="position: relative; top: 2px;">
                     <span style="color: white; font-family: 'Jura'; font-size: 18px; font-weight: 300;"> 20.000<br></span>
                     <img src="images/icons/bronze.png" width="18" style="position: relative; top: 2px;">
-                    <span style="color: white; font-family: 'Jura'; font-size: 18px; font-weight: 300;"> 24.000<br></span></p>
-            `
+                    <span style="color: white; font-family: 'Jura'; font-size: 18px; font-weight: 300;"> 24.000</span>`
         },
     ];
 
@@ -1994,6 +2005,7 @@
         {
             id: "dashTraining",
             position: transCoord(4437,2395),
+            goalPosition: [transCoord(4449,2459),transCoord(4427,2529),transCoord(4297,2605)],
             icon: poiIcons["basicChallenge"],
             title: `<span style="color: white; font-family: 'Jura'; font-size: 24px; font-weight: normal;">Dash Training</span>`,
             content: `
@@ -2012,6 +2024,7 @@
         {
             id: "theArtOfPowerslide",
             position: transCoord(3972,2619),
+            goalPosition: [transCoord(3916,2612),transCoord(3870,2620),transCoord(3874,2622)],
             icon: poiIcons["basicChallenge"],
             title: `<span style="color: white; font-family: 'Jura'; font-size: 24px; font-weight: normal;">The Art of Powerslide</span>`,
             content: `
@@ -2030,7 +2043,8 @@
         },
         {
             id: "aLongerJump",
-            position: transCoord(3995,2758),
+            position: transCoord(4000,2763),
+            goalPosition: [transCoord(3953,2674),transCoord(3924,2623),transCoord(4138,2618),transCoord(4142,2518),transCoord(4131,2406)],
             icon: poiIcons["moderateChallenge"],
             title: `<span style="color: white; font-family: 'Jura'; font-size: 24px; font-weight: normal;">A Longer Jump</span>`,
             content: `
@@ -2050,6 +2064,7 @@
         {
             id: "dropper",
             position: transCoord(3566,2344),
+            goalPosition: [transCoord(3585,2404),transCoord(3646,2383),transCoord(3694,2391),transCoord(3690,2320),transCoord(3682,2250)],
             icon: poiIcons["moderateChallenge"],
             title: `<span style="color: white; font-family: 'Jura'; font-size: 24px; font-weight: normal;">Dropper</span>`,
             content: `
@@ -2069,6 +2084,7 @@
         {
             id: "advancementAlpha",
             position: transCoord(4158,2526),
+            goalPosition: [transCoord(4015,2667),transCoord(3751,2860),transCoord(3500,2844),transCoord(3452,3081)],
             icon: poiIcons["toughChallenge"],
             title: `<span style="color: white; font-family: 'Jura'; font-size: 24px; font-weight: normal;">Advancement Alpha</span>`,
             content: `
@@ -2089,6 +2105,8 @@
         {
             id: "wallClimbBoost",
             position: transCoord(3050,1958),
+            goalPosition: [transCoord(2997,1825),transCoord(2936,1798),transCoord(2871,1826),transCoord(2813,1796),
+            transCoord(2542,1787),transCoord(2405,1812)],
             icon: poiIcons["toughChallenge"],
             title: `<span style="color: white; font-family: 'Jura'; font-size: 24px; font-weight: normal;">Wall Climb Boost</span>`,
             content: `
@@ -2108,6 +2126,7 @@
         {
             id: "legDay",
             position: transCoord(2680,2295),
+            goalPosition: [transCoord(2836,2257),transCoord(2986,2218)],
             icon: poiIcons["advancedChallenge"],
             title: `<span style="color: white; font-family: 'Jura'; font-size: 24px; font-weight: normal;">Leg Day</span>`,
             content: `
@@ -2127,6 +2146,8 @@
         {
             id: "advancementBeta",
             position: transCoord(3259,1811),
+            goalPosition: [transCoord(3005,1895),transCoord(2925,1936),transCoord(2833,1966),transCoord(2709,2198),
+            transCoord(2800,2400),transCoord(2767,2496),transCoord(2722,2580),transCoord(2586,2476),transCoord(2426,2365)],
             icon: poiIcons["insaneChallenge"],
             title: `<span style="color: white; font-family: 'Jura'; font-size: 24px; font-weight: normal;">Advancement Beta</span>`,
             content: `
@@ -2242,7 +2263,10 @@
 
 
     let selectedPOI = null;
-    let goalMarker = null;
+    let currentRace = null;
+    let goalMarker = [];
+    let goalMarkerAux = [];
+    var goalMarkerDeleting=false;
 
     let syncStore = [];
     // Function to add POI markers
@@ -2298,14 +2322,10 @@
 
         // Add click event to open sidebar
         marker.on('click', function () {
-            updateSelectedPOI({marker, id: trial.id});
+            updateSelectedPOI({marker, id: trial.id},trial);
             document.getElementById('sidebar-title').innerHTML = trial.title;
             document.getElementById('sidebar-content').innerHTML = trial.content;
 
-            if (trial.goalPosition) {
-                if (goalMarker) map.removeLayer(goalMarker); // Remove existing goal marker if present
-                goalMarker = L.marker(trial.goalPosition, { icon: poiIcons["checkpoint"] }).addTo(map);
-            }
 
         });
     });
@@ -2343,7 +2363,7 @@
 
         // Add click event to open sidebar
         marker.on('click', function () {
-            updateSelectedPOI({marker, id: challenge.id});
+            updateSelectedPOI({marker, id: challenge.id},challenge);
             document.getElementById('sidebar-title').innerHTML = challenge.title;
             document.getElementById('sidebar-content').innerHTML = challenge.content;
         });
@@ -2382,7 +2402,7 @@
 
         // Add click event to open sidebar
         marker.on('click', function () {
-            updateSelectedPOI({marker, id: poi.id});
+            updateSelectedPOI({marker, id: poi.id},null);
             document.getElementById('sidebar-title').innerHTML = poi.title;
             document.getElementById('sidebar-content').innerHTML = poi.content;
             //document.getElementById("sidebar").style.right = "0px"; // Slide out 
@@ -2407,6 +2427,7 @@
 
     function closeSidebar() {
         document.getElementById("sidebar").style.right = "-350px"; // Slide in
+        goalDelete();
         deselectPOI();
     }
     
@@ -2455,15 +2476,15 @@
 
     
     // Open sidebar on click
-    labelFragment.on("click", function () {openSidebar("fragment"); if(selectedPOI){deselectPOI();} console.log("Fragment clicked!");});
-    labelSkyarc.on("click", function () {openSidebar("skyarc"); if(selectedPOI){deselectPOI();} console.log("Skyarc clicked!");});
-    labelMirror.on("click", function () {openSidebar("mirror"); if(selectedPOI){deselectPOI();} console.log("The Mirror clicked!");});
-    labelCitra.on("click", function () {openSidebar("citra"); if(selectedPOI){deselectPOI();} console.log("Citra clicked!");});
-    labelDowntown.on("click", function () {openSidebar("downtown"); if(selectedPOI){deselectPOI();} console.log("Downtown clicked!");});
-    labelDirwik.on("click", function () {openSidebar("dirwik"); if(selectedPOI){deselectPOI();} console.log("Dirwik clicked!");});
-    labelStack.on("click", function () {openSidebar("stack"); if(selectedPOI){deselectPOI();} console.log("Stack clicked!");});
-    labelAxiom.on("click", function () {openSidebar("axiom"); if(selectedPOI){deselectPOI();} console.log("Axiom clicked!");});
-    labelVertex.on("click", function () {openSidebar("vertex"); if(selectedPOI){deselectPOI();} console.log("Vertex clicked!");});
+    labelFragment.on("click", function () {openSidebar("fragment"); if(selectedPOI){deselectPOI(); goalDelete();} console.log("Fragment clicked!");});
+    labelSkyarc.on("click", function () {openSidebar("skyarc"); if(selectedPOI){deselectPOI(); goalDelete();} console.log("Skyarc clicked!");});
+    labelMirror.on("click", function () {openSidebar("mirror"); if(selectedPOI){deselectPOI(); goalDelete();} console.log("The Mirror clicked!");});
+    labelCitra.on("click", function () {openSidebar("citra"); if(selectedPOI){deselectPOI(); goalDelete();} console.log("Citra clicked!");});
+    labelDowntown.on("click", function () {openSidebar("downtown"); if(selectedPOI){deselectPOI(); goalDelete();} console.log("Downtown clicked!");});
+    labelDirwik.on("click", function () {openSidebar("dirwik"); if(selectedPOI){deselectPOI(); goalDelete();} console.log("Dirwik clicked!");});
+    labelStack.on("click", function () {openSidebar("stack"); if(selectedPOI){deselectPOI(); goalDelete();} console.log("Stack clicked!");});
+    labelAxiom.on("click", function () {openSidebar("axiom"); if(selectedPOI){deselectPOI(); goalDelete();} console.log("Axiom clicked!");});
+    labelVertex.on("click", function () {openSidebar("vertex"); if(selectedPOI){deselectPOI(); goalDelete();} console.log("Vertex clicked!");});
     
     function updateSyncOpacity() {
         let zoomLevel = map.getZoom();
@@ -2537,21 +2558,102 @@
         });
     };
 
+    function goalRender(race){
+        goalDelete(); // Remove existing goal marker if present
+        if (race==null||race.goalPosition==null){return;}
+        goalMarker=[];
 
+        let raceType=null;
+        let raceSize=race.goalPosition.length;
+        if (raceSize==1) {raceType="trial";}
+        if (raceSize>=2) {raceType="challenge";}
+        
+        
+        if (raceType=="trial") {
+            goalMarker = [L.marker(race.goalPosition[0], { icon: poiIcons["goal"], opacity: 0, transition: "opacity 0.3s ease-in-out" }).addTo(map)];
+            let goalIcon = goalMarker[0]._icon;
+            requestAnimationFrame(() => {goalIcon.style.opacity = 1;});
+                
+        }
 
-    function updateSelectedPOI(newPOI){
+        if (raceType=="challenge") {
+            for (let i = 0; i < raceSize; i++) {
+                if (i==raceSize-1) {
+                    goalMarker.push(L.marker(race.goalPosition[i], { icon: poiIcons["goal"], opacity: 0, transition: "opacity 0.2s ease-in-out" }).addTo(map));
+                } else {
+                    goalMarker.push(L.marker(race.goalPosition[i], { icon: poiIcons["checkpoint"], opacity: 0, transition: "opacity 0.3s ease-in-out" }).addTo(map));
+                }
+                let goalIcon = goalMarker[i]._icon;
+                requestAnimationFrame(() => {goalIcon.style.opacity = 1;});
+            }
+        }
+        currentRace=race;
+    };
+
+    function goalDelete() {
+        //let raceType=null;
+        let raceSize=goalMarker.length;
+        console.log(raceSize);
+        if (goalMarker[0]==null||goalMarker==[]) {return;}
+        //console.log(goalMarker);
+        /*if (!race) {return;}
+        if (raceSize==1) {raceType="trial";}
+        if (raceSize>=2) {raceType="challenge";}
+
+        if (raceType=="trial") {
+            //console.log(goalMarker[0].getLatLng());
+            map.removeLayer(goalMarker[0]);
+        }
+
+        if (raceType="challenge") {
+            for (let i = 0; i < raceSize; i++) {
+                map.removeLayer(goalMarker[i]);
+            }
+        }*/
+        if (!goalMarkerDeleting) {
+            goalMarkerAux=goalMarker;
+            goalMarkerDeleting=true;
+            for (let i = 0; i < goalMarkerAux.length; i++) {
+                let goalIcon = goalMarkerAux[i]._icon;
+                requestAnimationFrame(() => {goalIcon.style.opacity = 0;});
+                
+            }
+            goalMarker=[];
+            setTimeout(() => {
+                
+                for (let i = 0; i < goalMarkerAux.length; i++) {
+                    map.removeLayer(goalMarkerAux[0]);
+                    /*console.log(i);
+                    console.log(goalMarker);*/
+                    goalMarkerAux.shift();
+                    console.log("deleted index "+i);
+
+                }
+            }, 300);
+            goalMarkerDeleting=false;
+        } else {
+            console.log("currently deleting previous markers. skipping...");
+        }
+        
+        //goalMarker=[];
+    };
+
+    function updateSelectedPOI(newPOI,race){
         //console.log("newPOI"+newPOI.id+"selPOI"+selectedPOI.id);
-        if (selectedPOI){
-            if (newPOI.marker===selectedPOI.marker) {
-                closeSidebar();
+        
+        if (selectedPOI){                               //if there was a previously selected POI, then
+            if (newPOI.marker===selectedPOI.marker) {       //if I clicked the same POI
+                closeSidebar();                             // then close the sidebar - get rid of the checkpoints
             } else {
                 if (selectedPOI!=null) {selectedPOI.marker._icon.style.filter = "brightness(1)";}
                 openSidebarA();
+                goalRender(race);
                 newPOI.marker._icon.style.filter = "brightness(0.5)";
                 selectedPOI=newPOI;
-            }
+            }   
         } else {
             openSidebarA();
+            goalRender(race);
             newPOI.marker._icon.style.filter = "brightness(0.5)";
             selectedPOI=newPOI;
         }
