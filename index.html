@@ -61,6 +61,7 @@
             padding: 5px 10px;
             border-radius: 8px;
             border: 1px solid white;
+            pointer-events: auto; /* Allow interactions */
         }
         
         .poi-tooltip::before {
@@ -77,12 +78,19 @@
             /*line-height: 1;*/
             margin: 0;
             box-sizing: border-box;
+            pointer-events: auto; /* Allow interactions */
         }
 
         .poi-tooltip-second::before {
             border-bottom-color: rgba(255, 255, 255, 0) !important; /* Change arrow color */
             border-width: 6px; /* Adjust arrow size */
         }
+
+        /*.poi-tooltip:hover,
+        .poi-tooltip-second:hover {
+            opacity: 0.2 !important; /* Make the tooltip transparent 
+            transition: opacity 0.2s ease-in-out;
+        }*/
 
         /* reenable for web deployment*/
         
@@ -2512,6 +2520,8 @@
 
                 secondTooltip.setLatLng(marker.getLatLng());
                 map.addLayer(secondTooltip);
+
+                attachTooltipListeners(firstTooltip,secondTooltip);
             }
         });
 
@@ -2530,18 +2540,25 @@
                 map.removeLayer(firstTooltip);
                 map.removeLayer(secondTooltip);
             }
-        });
-
-        // Add click event to open sidebar
-        marker.on('click', function () {
-            
-            updateSelectedPOI({marker, id: trial.id},trial,trial);
-            document.getElementById('sidebar-title').innerHTML = trial.title;
-            document.getElementById('sidebar-content').innerHTML = trial.content;
-
+            if (!isWaitingUnrender&&trial.isSelected) {
+                firstTooltip._container.addEventListener('click', function () {
+                    restoreTooltipOpacity(firstTooltip);
+                });
+                
+                secondTooltip._container.addEventListener('click', function () {
+                    restoreTooltipOpacity(secondTooltip);
+                });
+            }
         });
 
         
+
+        // Add click event to open sidebar
+        marker.on('click', function () {
+            updateSelectedPOI({marker, id: trial.id},trial,trial);
+            document.getElementById('sidebar-title').innerHTML = trial.title;
+            document.getElementById('sidebar-content').innerHTML = trial.content;
+        });
 
     });
 
@@ -2657,7 +2674,38 @@
     });
 
 
+    function restoreTooltipOpacity (tooltip){
+        tooltip.setOpacity("0.9");
+        console.log(tooltip);
+    };
 
+    function removeTooltipOpacity (tooltip){
+        tooltip.setOpacity("0");
+        console.log(tooltip);
+    };
+    
+    function attachTooltipListeners(tooltip1,tooltip2) {
+        console.log(tooltip1._container);
+        tooltip1._container.addEventListener('click', function () {
+            removeTooltipOpacity(tooltip1);
+        });
+        tooltip2._container.addEventListener('click', function () {
+            removeTooltipOpacity(tooltip2);
+        });
+        tooltip1._container.addEventListener('mouseover', function () {
+            removeTooltipOpacity(tooltip1);
+        });
+        tooltip2._container.addEventListener('mouseover', function () {
+            removeTooltipOpacity(tooltip2);
+        });
+        tooltip1._container.addEventListener('mouseout', function () {
+            restoreTooltipOpacity(tooltip1);
+        });
+        tooltip2._container.addEventListener('mouseout', function () {
+            restoreTooltipOpacity(tooltip2);
+        });
+        
+    }
 
     // Function to open the sidebar with specific content
     function openSidebar(contentKey) {
