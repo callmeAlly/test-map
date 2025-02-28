@@ -2421,13 +2421,7 @@
     // Function to add POI markers
     syncs.forEach(sync => {
         var marker = L.marker(sync.position, { icon: sync.icon }).addTo(map).setZIndexOffset(9000);
-        /*.bindTooltip(sync.title, { 
-            permanent: false,   // Show only on hover
-            direction: "top",   // Position above the marker
-            offset: [0, -10],   // Adjust the position slightly
-            opacity: 0.9,
-            className: "sync-tooltip" // Custom styling
-        });*/
+
         var firstTooltip = L.tooltip({
             permanent: true,
             direction: "top",   
@@ -2438,18 +2432,51 @@
         .setContent(sync.title);
         
         
-        
         console.log('p'+sync.position);
         syncStore.push({marker, id: sync.id});
 
         var isWaitingUnrender=false;
 
         //tooltips
+
+        var isForcedTransparent=false;
+        var isHoveringOnTooltip=false;
+
+        const handleTooltipClick = (tooltip) => {
+            removeTooltipOpacity(tooltip);
+            isForcedTransparent=true;
+        };
+        const handleTooltipOnHover = (tooltip) => {
+            isHoveringOnTooltip=true;
+            if (!isForcedTransparent) {
+                removeTooltipOpacity(tooltip);
+            }
+        };
+        const handleTooltipOnLeave = (tooltip) => {
+            isHoveringOnTooltip=false;
+            if (!isForcedTransparent) {
+                restoreTooltipOpacity(tooltip);
+            }
+        };
+        const removeTooltipListeners = (tooltip) => {
+            tooltip._container.removeEventListener("click",handleTooltipClick);
+            tooltip._container.removeEventListener("mouseover",handleTooltipOnHover);
+            tooltip._container.removeEventListener("mouseout",handleTooltipOnLeave);
+        }
+
+
         marker.on("mouseover", function() {
             isWaitingUnrender=false;
             if (!sync.isSelected) {
                 firstTooltip.setLatLng(marker.getLatLng());
                 map.addLayer(firstTooltip);
+
+                // handle tooltips
+                isForcedTransparent=false;
+                restoreTooltipOpacity(firstTooltip);
+                firstTooltip._container.addEventListener('click', () => handleTooltipClick(firstTooltip));
+                firstTooltip._container.addEventListener('mouseover', () => handleTooltipOnHover(firstTooltip));
+                firstTooltip._container.addEventListener('mouseout', () => handleTooltipOnLeave(firstTooltip));
             }
         });
 
@@ -2457,6 +2484,8 @@
         marker.on("mouseout", function() {
             isWaitingUnrender=true;
             if (!sync.isSelected) {
+
+                removeTooltipListeners(firstTooltip);
                 map.removeLayer(firstTooltip);
             }
         });
@@ -2464,7 +2493,14 @@
         // trigger screen tooltip removal after deselection
         document.addEventListener('click', function () {
             if (isWaitingUnrender&&!sync.isSelected){
+
+                removeTooltipListeners(firstTooltip);
                 map.removeLayer(firstTooltip);
+            }
+
+            if (sync.isSelected&&isForcedTransparent&&!isHoveringOnTooltip) {
+                isForcedTransparent=false;                                    
+                restoreTooltipOpacity(firstTooltip);                                                
             }
         });
 
@@ -2473,20 +2509,12 @@
             updateSelectedPOI({marker, id: sync.id}, null, sync);
             document.getElementById('sidebar-title').innerHTML = sync.title;
             document.getElementById('sidebar-content').innerHTML = sync.content;
-            //document.getElementById("sidebar").style.right = "0px"; // Slide out 
         });
     });
 
     let trialStore = [];
     trials.forEach(trial => {
         var marker = L.marker(trial.position, { icon: trial.icon }).addTo(map).setZIndexOffset(9000);
-        /*.bindTooltip(trial.title, { 
-            permanent: false,   // Show only on hover
-            direction: "top",   // Position above the marker
-            offset: [0, -10],   // Adjust the position slightly
-            opacity: 0.9,
-            className: "poi-tooltip" // Custom styling
-        });*/
 
         var firstTooltip = L.tooltip({
             permanent: true,
@@ -2512,6 +2540,38 @@
         var isWaitingUnrender=false;
 
         //tooltips
+
+        var isForcedTransparent=false;
+        var isHoveringOnTooltip=false;
+
+        const handleTooltipClick = (tooltip) => {
+            removeTooltipOpacity(tooltip);
+            isForcedTransparent=true;
+        };
+        const handleTooltipOnHover = (tooltip) => {
+            isHoveringOnTooltip=true;
+            if (!isForcedTransparent) {
+                removeTooltipOpacity(tooltip);
+            }
+        };
+        const handleTooltipOnLeave = (tooltip) => {
+            isHoveringOnTooltip=false;
+            if (!isForcedTransparent) {
+                restoreTooltipOpacity(tooltip);
+            }
+        };
+        const removeTooltipListeners = (tooltip1,tooltip2) => {
+            tooltip1._container.removeEventListener("click",handleTooltipClick);
+            tooltip1._container.removeEventListener("mouseover",handleTooltipOnHover);
+            tooltip1._container.removeEventListener("mouseout",handleTooltipOnLeave);
+            tooltip2._container.removeEventListener("click",handleTooltipClick);
+            tooltip2._container.removeEventListener("mouseover",handleTooltipOnHover);
+            tooltip2._container.removeEventListener("mouseout",handleTooltipOnLeave);
+        }
+
+
+
+
         marker.on("mouseover", function() {
             isWaitingUnrender=false;
             if (!trial.isSelected) {
@@ -2521,37 +2581,50 @@
                 secondTooltip.setLatLng(marker.getLatLng());
                 map.addLayer(secondTooltip);
 
-                attachTooltipListeners(firstTooltip,secondTooltip);
+                // handle tooltips
+                isForcedTransparent=false;
+                restoreTooltipOpacity(firstTooltip);
+                restoreTooltipOpacity(secondTooltip);
+                firstTooltip._container.addEventListener('click', () => handleTooltipClick(firstTooltip));
+                secondTooltip._container.addEventListener('click', () => handleTooltipClick(secondTooltip));
+                firstTooltip._container.addEventListener('mouseover', () => handleTooltipOnHover(firstTooltip));
+                secondTooltip._container.addEventListener('mouseover', () => handleTooltipOnHover(secondTooltip));
+                firstTooltip._container.addEventListener('mouseout', () => handleTooltipOnLeave(firstTooltip));
+                secondTooltip._container.addEventListener('mouseout', () => handleTooltipOnLeave(secondTooltip));
+                
             }
         });
 
         // hide tooltips
         marker.on("mouseout", function() {
             isWaitingUnrender=true;
-            if (!trial.isSelected) {
-                map.removeLayer(firstTooltip);
+            if (!trial.isSelected) {    // if trial is not selected and the mouse is not over the marker
+
+                removeTooltipListeners(firstTooltip,secondTooltip); // clear the tooltip listeners for transparency
+                map.removeLayer(firstTooltip);          // remove the tooltips from the map
                 map.removeLayer(secondTooltip);
             }
         });
 
         // trigger screen tooltip removal after deselection
-        document.addEventListener('click', function () {
-            if (isWaitingUnrender&&!trial.isSelected){
-                map.removeLayer(firstTooltip);
+        document.addEventListener('click', function () {    //if i click anywhere on the screen
+            if (isWaitingUnrender&&!trial.isSelected){  // and the trial is not selected & the mouse is not over the marker
+
+                removeTooltipListeners(firstTooltip,secondTooltip); // clear the tooltip listeners for transparency
+                map.removeLayer(firstTooltip);          // remove tooltips from the map
                 map.removeLayer(secondTooltip);
             }
-            if (!isWaitingUnrender&&trial.isSelected) {
-                firstTooltip._container.addEventListener('click', function () {
-                    restoreTooltipOpacity(firstTooltip);
-                });
-                
-                secondTooltip._container.addEventListener('click', function () {
-                    restoreTooltipOpacity(secondTooltip);
-                });
+
+            if (trial.isSelected&&isForcedTransparent&&!isHoveringOnTooltip) {    //if I click anywhere on the screen
+                isForcedTransparent=false;                                      // and the trial is selected, and the mouse is not
+                restoreTooltipOpacity(firstTooltip);                            // over the marker, and i have tapped the tooltips
+                restoreTooltipOpacity(secondTooltip);                           // untap the tooltips, and reset tooltip opacity
             }
         });
 
         
+
+
 
         // Add click event to open sidebar
         marker.on('click', function () {
@@ -2565,13 +2638,6 @@
     let challengeStore = [];
     challenges.forEach(challenge => {
         var marker = L.marker(challenge.position, { icon: challenge.icon }).addTo(map).setZIndexOffset(9000);
-        /*.bindTooltip(trial.title, { 
-            permanent: false,   // Show only on hover
-            direction: "top",   // Position above the marker
-            offset: [0, -10],   // Adjust the position slightly
-            opacity: 0.9,
-            className: "poi-tooltip" // Custom styling
-        });*/
 
         var firstTooltip = L.tooltip({
             permanent: true,
@@ -2597,6 +2663,38 @@
         var isWaitingUnrender=false;
 
         //tooltips
+
+        var isForcedTransparent=false;
+        var isHoveringOnTooltip=false;
+
+        const handleTooltipClick = (tooltip) => {
+            removeTooltipOpacity(tooltip);
+            isForcedTransparent=true;
+        };
+        const handleTooltipOnHover = (tooltip) => {
+            isHoveringOnTooltip=true;
+            if (!isForcedTransparent) {
+                removeTooltipOpacity(tooltip);
+            }
+        };
+        const handleTooltipOnLeave = (tooltip) => {
+            isHoveringOnTooltip=false;
+            if (!isForcedTransparent) {
+                restoreTooltipOpacity(tooltip);
+            }
+        };
+        const removeTooltipListeners = (tooltip1,tooltip2) => {
+            tooltip1._container.removeEventListener("click",handleTooltipClick);
+            tooltip1._container.removeEventListener("mouseover",handleTooltipOnHover);
+            tooltip1._container.removeEventListener("mouseout",handleTooltipOnLeave);
+            tooltip2._container.removeEventListener("click",handleTooltipClick);
+            tooltip2._container.removeEventListener("mouseover",handleTooltipOnHover);
+            tooltip2._container.removeEventListener("mouseout",handleTooltipOnLeave);
+        }
+
+
+
+
         marker.on("mouseover", function() {
             isWaitingUnrender=false;
             if (!challenge.isSelected) {
@@ -2605,6 +2703,17 @@
 
                 secondTooltip.setLatLng(marker.getLatLng());
                 map.addLayer(secondTooltip);
+
+                // handle tooltips
+                isForcedTransparent=false;
+                restoreTooltipOpacity(firstTooltip);
+                restoreTooltipOpacity(secondTooltip);
+                firstTooltip._container.addEventListener('click', () => handleTooltipClick(firstTooltip));
+                secondTooltip._container.addEventListener('click', () => handleTooltipClick(secondTooltip));
+                firstTooltip._container.addEventListener('mouseover', () => handleTooltipOnHover(firstTooltip));
+                secondTooltip._container.addEventListener('mouseover', () => handleTooltipOnHover(secondTooltip));
+                firstTooltip._container.addEventListener('mouseout', () => handleTooltipOnLeave(firstTooltip));
+                secondTooltip._container.addEventListener('mouseout', () => handleTooltipOnLeave(secondTooltip));
             }
         });
 
@@ -2612,6 +2721,8 @@
         marker.on("mouseout", function() {
             isWaitingUnrender=true;
             if (!challenge.isSelected) {
+
+                removeTooltipListeners(firstTooltip,secondTooltip);
                 map.removeLayer(firstTooltip);
                 map.removeLayer(secondTooltip);
             }
@@ -2620,8 +2731,16 @@
         // trigger screen tooltip removal after deselection
         document.addEventListener('click', function () {
             if (isWaitingUnrender&&!challenge.isSelected){
+                
+                removeTooltipListeners(firstTooltip,secondTooltip);
                 map.removeLayer(firstTooltip);
                 map.removeLayer(secondTooltip);
+            }
+            
+            if (challenge.isSelected&&isForcedTransparent&&!isHoveringOnTooltip) {
+                isForcedTransparent=false;                                    
+                restoreTooltipOpacity(firstTooltip);                          
+                restoreTooltipOpacity(secondTooltip);                         
             }
         });
 
@@ -2676,36 +2795,12 @@
 
     function restoreTooltipOpacity (tooltip){
         tooltip.setOpacity("0.9");
-        console.log(tooltip);
     };
 
     function removeTooltipOpacity (tooltip){
         tooltip.setOpacity("0");
-        console.log(tooltip);
     };
     
-    function attachTooltipListeners(tooltip1,tooltip2) {
-        console.log(tooltip1._container);
-        tooltip1._container.addEventListener('click', function () {
-            removeTooltipOpacity(tooltip1);
-        });
-        tooltip2._container.addEventListener('click', function () {
-            removeTooltipOpacity(tooltip2);
-        });
-        tooltip1._container.addEventListener('mouseover', function () {
-            removeTooltipOpacity(tooltip1);
-        });
-        tooltip2._container.addEventListener('mouseover', function () {
-            removeTooltipOpacity(tooltip2);
-        });
-        tooltip1._container.addEventListener('mouseout', function () {
-            restoreTooltipOpacity(tooltip1);
-        });
-        tooltip2._container.addEventListener('mouseout', function () {
-            restoreTooltipOpacity(tooltip2);
-        });
-        
-    }
 
     // Function to open the sidebar with specific content
     function openSidebar(contentKey) {
