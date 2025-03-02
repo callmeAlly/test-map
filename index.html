@@ -161,7 +161,7 @@
 
 <script>
 
-    
+    var isMobile = "ontouchstart" in window || navigator.maxTouchPoints > 0;
 
     // Dimensions of the image
     var imageWidth = 9600, imageHeight = 5400; // Replace with your actual image size
@@ -2509,6 +2509,11 @@
             updateSelectedPOI({marker, id: sync.id}, null, sync);
             document.getElementById('sidebar-title').innerHTML = sync.title;
             document.getElementById('sidebar-content').innerHTML = sync.content;
+            
+            if (!isWaitingUnrender&&!sync.isSelected&&isMobile) {
+                removeTooltipListeners(firstTooltip); 
+                map.removeLayer(firstTooltip);    
+            }
         });
     });
 
@@ -2543,6 +2548,7 @@
 
         var isForcedTransparent=false;
         var isHoveringOnTooltip=false;
+        var isSelectionChanging=false;
 
         const handleTooltipClick = (tooltip) => {
             removeTooltipOpacity(tooltip);
@@ -2614,6 +2620,7 @@
                 map.removeLayer(firstTooltip);          // remove tooltips from the map
                 map.removeLayer(secondTooltip);
             }
+            
 
             if (trial.isSelected&&isForcedTransparent&&!isHoveringOnTooltip) {    //if I click anywhere on the screen
                 isForcedTransparent=false;                                      // and the trial is selected, and the mouse is not
@@ -2631,6 +2638,12 @@
             updateSelectedPOI({marker, id: trial.id},trial,trial);
             document.getElementById('sidebar-title').innerHTML = trial.title;
             document.getElementById('sidebar-content').innerHTML = trial.content;
+
+            if (!isWaitingUnrender&&!trial.isSelected&&isMobile) {
+                removeTooltipListeners(firstTooltip,secondTooltip); 
+                map.removeLayer(firstTooltip);    
+                map.removeLayer(secondTooltip);
+            }
         });
 
     });
@@ -2749,6 +2762,12 @@
             updateSelectedPOI({marker, id: challenge.id},challenge,challenge);
             document.getElementById('sidebar-title').innerHTML = challenge.title;
             document.getElementById('sidebar-content').innerHTML = challenge.content;
+            
+            if (!isWaitingUnrender&&!challenge.isSelected&&isMobile) {
+                removeTooltipListeners(firstTooltip,secondTooltip); 
+                map.removeLayer(firstTooltip);    
+                map.removeLayer(secondTooltip);
+            }
         });
     });
 
@@ -2808,7 +2827,7 @@
         if (content) {
             document.getElementById("sidebar-title").innerHTML = content.title;
             document.getElementById("sidebar-content").innerHTML = content.content;
-            //document.getElementById("sidebar").style.right = "0px"; // Slide out 
+            document.getElementById("sidebar").style.right = "0px"; // Slide out 
         }
     }
 
@@ -2822,7 +2841,7 @@
     }
     
     function openSidebarA() {
-        //document.getElementById("sidebar").style.right = "0px"; // Slide out 
+        document.getElementById("sidebar").style.right = "0px"; // Slide out 
     }
 
     function createLabel(lat, lng, text, font, weight, italic = false, color, size) {
