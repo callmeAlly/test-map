@@ -92,6 +92,8 @@
             justify-content: center;
             text-align: center;
             white-space: nowrap;
+            -webkit-text-stroke: 1.5px #000;
+            paint-order: stroke fill;
         }
 
         /*.poi-tooltip:hover,
@@ -3235,11 +3237,6 @@
     map.options.wheelPxPerZoomLevel = 120; // Adjust for finer control (default is 60)
 
 
-
-    // Example: Add a marker
-    /*L.marker([1, 1]).addTo(map) // Place at (X, Y)
-        .bindPopup("Point of Interest")
-        .openPopup();*/
 </script>
 
 </body>
