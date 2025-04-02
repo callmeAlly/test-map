@@ -86,6 +86,14 @@
             border-width: 6px; /* Adjust arrow size */
         }
 
+        .static-label {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            text-align: center;
+            white-space: nowrap;
+        }
+
         /*.poi-tooltip:hover,
         .poi-tooltip-second:hover {
             opacity: 0.2 !important; /* Make the tooltip transparent 
@@ -192,7 +200,7 @@
     });
 
     // Add the image as a layer
-    L.imageOverlay('MapBase.png', bounds).addTo(map);
+    L.imageOverlay('MapBasse.png', bounds).addTo(map);
 
     // Fit the map to the image size
     map.fitBounds(bounds);
@@ -747,7 +755,7 @@
             title: `<span style="color: white; font-family: 'Jura'; font-size: 24px; font-weight: normal;">Neva Again</span>`,
             content: `
                 <img src="images/icons/lol.png" alt="Neva Again" style="width: 100%; border-radius: 8px; margin-bottom: 10px;">
-                <p><span style="color: white; font-family: 'Source Sans 3'; font-weight: 300;">You can smell the smoke from here.</span></p>
+                <p><span style="color: white; font-family: 'Source Sans 3'; font-weight: 300;">Maybe sit down for a bit.</span></p>
             `
         },
         {
@@ -1160,7 +1168,7 @@
             title: `<span style="color: white; font-family: 'Jura'; font-size: 24px; font-weight: normal;">Clover Drift</span>`,
             content: `
                 <img src="images/icons/lol.png" alt="Clover Drift" style="width: 100%; border-radius: 8px; margin-bottom: 10px;">
-                <p><span style="color: white; font-family: 'Source Sans 3'; font-weight: 300;">Good luck getting here.</span></p>
+                <p><span style="color: white; font-family: 'Source Sans 3'; font-weight: 300;">Swing and a miss!</span></p>
             `
         },
         {
@@ -1212,9 +1220,9 @@
             position: transCoord(2648,1670),
             icon: poiIcons["sync"],
             isSelected: false,
-            title: `<span style="color: white; font-family: 'Jura'; font-size: 24px; font-weight: normal;">Dirwik Suburbs</span>`,
+            title: `<span style="color: white; font-family: 'Jura'; font-size: 24px; font-weight: normal;">Dirwik Tunnel</span>`,
             content: `
-                <img src="images/icons/lol.png" alt="Dirwik Suburbs" style="width: 100%; border-radius: 8px; margin-bottom: 10px;">
+                <img src="images/icons/lol.png" alt="Dirwik Tunnel" style="width: 100%; border-radius: 8px; margin-bottom: 10px;">
                 <p><span style="color: white; font-family: 'Source Sans 3'; font-weight: 300;">Needs more vandalism.</span></p>
             `
         },
@@ -1347,7 +1355,7 @@
             title: `<span style="color: white; font-family: 'Jura'; font-size: 24px; font-weight: normal;">Seating Overview</span>`,
             content: `
                 <img src="images/icons/lol.png" alt="Seating Overview" style="width: 100%; border-radius: 8px; margin-bottom: 10px;">
-                <p><span style="color: white; font-family: 'Source Sans 3'; font-weight: 300;">No railings?.</span></p>
+                <p><span style="color: white; font-family: 'Source Sans 3'; font-weight: 300;">No railings?</span></p>
             `
         },
         {
@@ -1471,7 +1479,7 @@
             title: `<span style="color: white; font-family: 'Jura'; font-size: 24px; font-weight: normal;">Times Square</span>`,
             content: `
                 <img src="images/icons/lol.png" alt="Temple" style="width: 100%; border-radius: 8px; margin-bottom: 10px;">
-                <p><span style="color: white; font-family: 'Source Sans 3'; font-weight: 300;">Try not to see an ad.</span></p>
+                <p><span style="color: white; font-family: 'Source Sans 3'; font-weight: 300;">Don't disable your adblocker!</span></p>
             `
         },
         {
@@ -1582,7 +1590,7 @@
             title: `<span style="color: white; font-family: 'Jura'; font-size: 24px; font-weight: normal;">Neb's Lair</span>`,
             content: `
                 <img src="images/icons/lol.png" alt="Temple" style="width: 100%; border-radius: 8px; margin-bottom: 10px;">
-                <p><span style="color: white; font-family: 'Source Sans 3'; font-weight: 300;">Who is this guy? :sob:</span></p>
+                <p><span style="color: white; font-family: 'Source Sans 3'; font-weight: 300;">It's Ben's evil twin!</span></p>
             `
         },
         {
@@ -1745,7 +1753,7 @@
         }
     ];
 
-    // Define POIs with their positions and sidebar content
+    // define POIs with their positions and sidebar content
     var poi = [
 
         ];
@@ -2314,6 +2322,114 @@
         }
     ];
 
+    // define labels
+
+    var staticLabels = [
+        //downtown
+        {
+            id: "downtownIndustrialBuffer",
+            position: transCoord(3751,1634), // trans rightssssss
+            name: "Industrial Gateway",
+            title: `<span style="color: #FAFAFB; font-family: 'Jura'; font-size: 14px; font-weight: normal;">Industrial Gateway</span>`,
+        },
+        {
+            id: "downtownSpawnArea",
+            position: transCoord(4378,2120),
+            name: "Spawn Area",
+            title: `<span style="color: #FAFAFB; font-family: 'Jura'; font-size: 14px; font-weight: normal;">Spawn Area</span>`,
+        },
+        //dirwik
+        {
+            id: "dirwikCelestialComplex",
+            position: transCoord(2809,2496),
+            name: "Celestial Complex",
+            title: `<span style="color: #FAFAFB; font-family: 'Jura'; font-size: 14px; font-weight: normal;">Celestial<br>Complex</span>`,
+        },
+        {
+            id: "dirwikConstructionComplex",
+            position: transCoord(3113,4187),
+            name: "Dirwik Construction Complex",
+            title: `<span style="color: #FAFAFB; font-family: 'Jura'; font-size: 14px; font-weight: normal;">Dirwik Construction<br>Complex</span>`,
+        },
+        {
+            id: "dirwikCorridor",
+            position: transCoord(3182,2398),
+            name: "Dirwik Corridor",
+            title: `<span style="color: #FAFAFB; font-family: 'Jura'; font-size: 14px; font-weight: normal;">Dirwik Corridor</span>`,
+        },
+        {
+            id: "dirwikNimbusComplex",
+            position: transCoord(2724,2216),
+            name: "Nimbus Complex",
+            title: `<span style="color: #FAFAFB; font-family: 'Jura'; font-size: 14px; font-weight: normal;">Nimbus<br>Complex</span>`,
+        },
+        {
+            id: "dirwikSuburbsSW",
+            position: transCoord(2555,4392),
+            name: "Suburbs",
+            title: `<span style="color: #FAFAFB; font-family: 'Jura'; font-size: 14px; font-weight: normal;">Suburbs</span>`,
+        },
+        
+        //fragment
+        {
+            id: "fragmentCorridor",
+            position: transCoord(4848,2956),
+            name: "Fragment Corridor",
+            title: `<span style="color: #FAFAFB; font-family: 'Jura'; font-size: 14px; font-weight: normal;">Fragment Corridor</span>`,
+        },
+        {
+            id: "fragmentHighriseSector",
+            position: transCoord(5384,1111),
+            name: "Highrise Sector",
+            title: `<span style="color: #FAFAFB; font-family: 'Jura'; font-size: 14px; font-weight: normal;">Highrise Sector</span>`,
+        },
+
+        //stack
+        {
+            id: "stackVoid",
+            position: transCoord(3936,1165),
+            name: "Buq0's Void",
+            title: `<span style="color: #FAFAFB; font-family: 'Jura'; font-size: 14px; font-weight: normal;">Buq0's Void</span>`,
+        },
+
+        //skyarc
+        {
+            id: "skyarcCommercialZone",
+            position: transCoord(4734,3699),
+            name: "Commercial Core",
+            title: `<span style="color: #FAFAFB; font-family: 'Jura'; font-size: 14px; font-weight: normal;">Commercial Core</span>`,
+        },
+        {
+            id: "skyarcComplex",
+            position: transCoord(3802,3796),
+            name: "Skyarc Complex",
+            title: `<span style="color: #FAFAFB; font-family: 'Jura'; font-size: 14px; font-weight: normal;">Skyarc Complex</span>`,
+        },
+        {
+            id: "skyarcCrossroads",
+            position: transCoord(4268,4283),
+            name: "Crossroads",
+            title: `<span style="color: #FAFAFB; font-family: 'Jura'; font-size: 14px; font-weight: normal;">Crossroads</span>`,
+        },
+        {
+            id: "skyarcHighDensityResidential",
+            position: transCoord(3616,4185),
+            name: "Residential Cluster",
+            title: `<span style="color: #FAFAFB; font-family: 'Jura'; font-size: 14px; font-weight: normal;">Residential<br>Cluster</span>`,
+        },
+
+        //the mirror
+        {
+            id: "mirrorCorridor",
+            position: transCoord(5761,2876),
+            name: "The Mirror Corridor",
+            title: `<span style="color: #FAFAFB; font-family: 'Jura'; font-size: 14px; font-weight: normal;">The Mirror Corridor</span>`,
+        },
+    ];
+    
+    
+    
+    
     var sidebarContents = {
         //districts
         "fragment": {
@@ -2454,7 +2570,7 @@
         };
         const handleTooltipOnLeave = (tooltip) => {
             isHoveringOnTooltip=false;
-            if (!isForcedTransparent) {
+            if (!isForcedTransparent&& !(!sync.isSelected&&isWaitingUnrender)) { // fix but for sync
                 restoreTooltipOpacity(tooltip);
             }
         };
@@ -2545,7 +2661,6 @@
         var isWaitingUnrender=false;
 
         //tooltips
-
         var isForcedTransparent=false;
         var isHoveringOnTooltip=false;
         var isSelectionChanging=false;
@@ -2562,7 +2677,7 @@
         };
         const handleTooltipOnLeave = (tooltip) => {
             isHoveringOnTooltip=false;
-            if (!isForcedTransparent) {
+            if (!isForcedTransparent && !(!trial.isSelected&&isWaitingUnrender)) { // holy cow this fixes the flickering thank heinz ketchup
                 restoreTooltipOpacity(tooltip);
             }
         };
@@ -2574,8 +2689,6 @@
             tooltip2._container.removeEventListener("mouseover",handleTooltipOnHover);
             tooltip2._container.removeEventListener("mouseout",handleTooltipOnLeave);
         }
-
-
 
 
         marker.on("mouseover", function() {
@@ -2629,9 +2742,6 @@
             }
         });
 
-        
-
-
 
         // Add click event to open sidebar
         marker.on('click', function () {
@@ -2676,7 +2786,6 @@
         var isWaitingUnrender=false;
 
         //tooltips
-
         var isForcedTransparent=false;
         var isHoveringOnTooltip=false;
 
@@ -2692,7 +2801,7 @@
         };
         const handleTooltipOnLeave = (tooltip) => {
             isHoveringOnTooltip=false;
-            if (!isForcedTransparent) {
+            if (!isForcedTransparent&& !(!challenge.isSelected&&isWaitingUnrender)) { // flicker fix for challenge
                 restoreTooltipOpacity(tooltip);
             }
         };
@@ -2821,18 +2930,31 @@
     };
     
 
+    //document.getElementById("close-btn").addEventListener("click", closeSidebar); duplicate from <head>
+
+    let staticLabelStore = [];
+    staticLabels.forEach(staticLabel => {
+
+        var label = L.divIcon({
+            className: "static-label",
+            html: staticLabel.title,
+            iconSize: [10,14],
+            iconAnchor: [5,7]
+        });
+        console.log(staticLabel.title+staticLabel.title.length/2)
+        var marker = L.marker(staticLabel.position, {icon: label, interactive:false}).addTo(map).setZIndexOffset(8500);
+        staticLabelStore.push({marker, id: staticLabel.id});
+    });
+
     // Function to open the sidebar with specific content
     function openSidebar(contentKey) {
         var content = sidebarContents[contentKey];
-        if (content) {
+        if (content&&!isMobile) { //added kill mobile
             document.getElementById("sidebar-title").innerHTML = content.title;
             document.getElementById("sidebar-content").innerHTML = content.content;
             document.getElementById("sidebar").style.right = "0px"; // Slide out 
         }
     }
-
-
-    //document.getElementById("close-btn").addEventListener("click", closeSidebar); duplicate from <head>
 
     function closeSidebar() {
         document.getElementById("sidebar").style.right = "-350px"; // Slide in
@@ -2841,7 +2963,9 @@
     }
     
     function openSidebarA() {
-        document.getElementById("sidebar").style.right = "0px"; // Slide out 
+        if (!isMobile) { //added kill mobile
+            document.getElementById("sidebar").style.right = "0px"; // Slide out 
+        }   
     }
 
     function createLabel(lat, lng, text, font, weight, italic = false, color, size) {
@@ -2871,20 +2995,20 @@
         //return L.marker([lat, lng], { icon: label }).addTo(map);
     }
 
-    // Example: Add labels at positions
-    var labelFragment = createLabel(flipY(2140), 5120, "FRAGMENT", "Merriweather", "regular", 0, "orange", 42);
-    var labelSkyarc = createLabel(flipY(3940), 4165,  "Skyarc", "Kalam", "regular", 0, "#32FF3D", 56);
-    var labelMirror = createLabel(flipY(2750), 6300,  "THE MIRROR", "Michroma", "regular", 0, "cyan", 36);
-    var labelCitra = createLabel(flipY(3935), 6080,  "citra", "Comic Neue Angular", "bold", 0, "gold", 56);
-    var labelDowntown = createLabel(flipY(2235), 4000,  "DOWNTOWN", "Sarpanch", "regular", 1, "#7AE0FF", 42);
-    var labelDirwik = createLabel(flipY(2785), 2860,  "DIRWIK", "Balthazar", "regular", 0, "#0091D2", 48);
+    // add labels at positions
+    var labelFragment = createLabel(flipY(2140), 5120, "FRAGMENT", "Merriweather", "regular", 0, "orange", 38);
+    var labelSkyarc = createLabel(flipY(3940), 4165,  "Skyarc", "Kalam", "regular", 0, "#32FF3D", 48);
+    var labelMirror = createLabel(flipY(2750), 6300,  "THE MIRROR", "Michroma", "regular", 0, "cyan", 32);
+    var labelCitra = createLabel(flipY(3935), 6080,  "citra", "Comic Neue Angular", "bold", 0, "gold", 50);
+    var labelDowntown = createLabel(flipY(2235), 4000,  "DOWNTOWN", "Sarpanch", "regular", 1, "#7AE0FF", 38);
+    var labelDirwik = createLabel(flipY(2785), 2860,  "DIRWIK", "Balthazar", "regular", 0, "#0091D2", 42);
     var labelStack = createLabel(flipY(1010), 3920,  "STACK", "Inconsolatazi4varl_qu", "regular", 0, "#D800FF", 48);
-    var labelAxiom = createLabel(flipY(1600), 6290,  "AXIOM", "Quicksand", "regular", 0, "#FF6EFF", 42);
-    var labelVertex = createLabel(flipY(3460), 4210,  "VERTEX", "Quicksand", "regular", 0, "#8BB2D3", 42);
+    var labelAxiom = createLabel(flipY(1600), 6290,  "AXIOM", "Quicksand", "regular", 0, "#FF6EFF", 38);
+    var labelVertex = createLabel(flipY(3460), 4210,  "VERTEX", "Quicksand", "regular", 0, "#8BB2D3", 36);
 
 
     
-    // Open sidebar on click
+    // open sidebar on click
     labelFragment.on("click", function () {openSidebar("fragment"); if(selectedPOI){deselectPOI(); goalDelete();} console.log("Fragment clicked!");});
     labelSkyarc.on("click", function () {openSidebar("skyarc"); if(selectedPOI){deselectPOI(); goalDelete();} console.log("Skyarc clicked!");});
     labelMirror.on("click", function () {openSidebar("mirror"); if(selectedPOI){deselectPOI(); goalDelete();} console.log("The Mirror clicked!");});
@@ -2895,6 +3019,10 @@
     labelAxiom.on("click", function () {openSidebar("axiom"); if(selectedPOI){deselectPOI(); goalDelete();} console.log("Axiom clicked!");});
     labelVertex.on("click", function () {openSidebar("vertex"); if(selectedPOI){deselectPOI(); goalDelete();} console.log("Vertex clicked!");});
     
+    // static labels
+
+    // ---------------------------------------------------
+
     function updateSyncOpacity() {
         let zoomLevel = map.getZoom();
         let opacity = 0;
