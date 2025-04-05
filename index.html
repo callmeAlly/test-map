@@ -86,13 +86,26 @@
             border-width: 6px; /* Adjust arrow size */
         }
 
+        .custom-label{
+            -webkit-text-stroke: 1.5px #fff;
+            paint-order: stroke fill;
+        }
+
         .static-label {
-            display: flex;
+            display: flex;  /*this fixes the offset labels*/
             align-items: center;
             justify-content: center;
             text-align: center;
             white-space: nowrap;
             -webkit-text-stroke: 1.5px #000;
+            paint-order: stroke fill;
+        }
+        .clickable-label-main{
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            text-align: center;
+            white-space: nowrap;
             paint-order: stroke fill;
         }
 
@@ -202,7 +215,7 @@
     });
 
     // Add the image as a layer
-    L.imageOverlay('MapBase.png', bounds).addTo(map);
+    L.imageOverlay('MapBasse.png', bounds).addTo(map);
 
     // Fit the map to the image size
     map.fitBounds(bounds);
@@ -2330,7 +2343,7 @@
         //downtown
         {
             id: "downtownIndustrialBuffer",
-            position: transCoord(3751,1634), // trans rightssssss
+            position: transCoord(3751,1634),
             name: "Industrial Gateway",
             title: `<span style="color: #FAFAFB; font-family: 'Jura'; font-size: 14px; font-weight: normal;">Industrial Gateway</span>`,
         },
@@ -2429,7 +2442,319 @@
         },
     ];
     
-    
+    var clickableLabelsMain = [
+        {
+            id: "downtownLogo",
+            position: transCoord(4000,2235),
+            contentKey: "downtown",
+            name: "Downtown",
+            title: `<span style="
+                    paint-order: stroke markers fill;
+                    -webkit-text-stroke: 4px transparent;
+	                -webkit-text-fill-color: transparent;
+
+                    background-clip: text;
+	                background-image: -webkit-linear-gradient(-83deg, #4D79F4 47%, #284a95 82%);
+                    
+                    padding-right: 5px;
+                    padding-left: 5px;
+
+                    font-family: 'Sarpanch';
+                    font-size: 38px;
+                    font-weight: normal;
+
+                    "><i>DOWNTOWN</i></span>`,
+            title2: `<span style="
+                    paint-order: stroke markers fill;
+	                -webkit-text-fill-color: transparent;
+                    
+                    background-clip: text;
+	                background-image: -webkit-linear-gradient(-83deg, #E2EAFF 40%, #BBC9E8 50%,  #E2EAFF 70%);
+                    
+                    padding-right: 5px;
+                    padding-left: 5px;
+
+                    font-family: 'Sarpanch';
+                    font-size: 38px;
+                    font-weight: normal;
+
+                    "><i>DOWNTOWN</i></span>`,
+        },
+        {
+            id: "dirwikLogo",
+            position: transCoord(2860,2785),
+            contentKey: "dirwik",
+            name: "Dirwik",
+            title: `<span style="
+                    paint-order: stroke markers fill;
+                    -webkit-text-stroke: 2.75px #3333337F;
+	                -webkit-text-fill-color: transparent;
+
+                    padding-right: 5px;
+                    padding-left: 5px;
+
+                    font-family: 'Balthazar';
+                    font-size: 42px;
+                    font-weight: normal;
+
+                    ">DIRWIK</span>`,
+            title2: `<span style="
+                    paint-order: stroke markers fill;
+	                -webkit-text-fill-color: transparent;
+
+                    background-clip: text;
+	                background-image: -webkit-linear-gradient(-180deg, #00baf8 10%, #006dac 75%);
+                    
+                    padding-right: 5px;
+                    padding-left: 5px;
+
+                    font-family: 'Balthazar';
+                    font-size: 42px;
+                    font-weight: normal;
+
+                    ">DIRWIK</span>`,
+        },
+        {
+            id: "fragmentLogo",
+            position: transCoord(5120,2140),
+            contentKey: "fragment",
+            name: "Fragment",
+            title: `<span style="
+                    paint-order: stroke markers fill;
+                    -webkit-text-stroke: 2.75px #3333337F;
+	                -webkit-text-fill-color: transparent;
+
+                    padding-right: 5px;
+                    padding-left: 5px;
+
+                    font-family: 'Merriweather';
+                    font-size: 38px;
+                    font-weight: normal;
+
+                    ">FRAGMENT</span>`,
+            title2: `<span style="
+                    paint-order: stroke markers fill;
+	                -webkit-text-fill-color: transparent;
+
+                    background-clip: text;
+	                background-image: -webkit-linear-gradient(90deg, #744f00 23%, #ff8000 55%);
+                    
+                    padding-right: 5px;
+                    padding-left: 5px;
+
+                    font-family: 'Merriweather';
+                    font-size: 38px;
+                    font-weight: normal;
+
+                    ">FRAGMENT</span>`,
+        },
+        {
+            id: "stackLogo",
+            position: transCoord(3920,1010),
+            contentKey: "stack",
+            name: "Stack",
+            title: `<span style="
+                    paint-order: stroke markers fill;
+                    -webkit-text-stroke: 2.75px #3333337F;
+	                -webkit-text-fill-color: transparent;
+
+                    padding-right: 5px;
+                    padding-left: 5px;
+
+                    font-family: 'Inconsolatazi4varl_qu';
+                    font-size: 48px;
+                    font-weight: normal;
+
+                    ">STACK</span>`,
+            title2: `<span style="
+                    paint-order: stroke markers fill;
+	                -webkit-text-fill-color: transparent;
+
+                    background-clip: text;
+	                background-image: -webkit-linear-gradient(90deg, #6b00e5 23%, #fe00f1 58%);
+                    
+                    padding-right: 5px;
+                    padding-left: 5px;
+
+                    font-family: 'Inconsolatazi4varl_qu';
+                    font-size: 48px;
+                    font-weight: normal;
+
+                    ">STACK</span>`,
+        },
+        {
+            id: "skyarcLogo",
+            position: transCoord(4165,3940),
+            contentKey: "skyarc",
+            name: "Skyarc",
+            title: `<span style="
+                    paint-order: stroke markers fill;
+                    -webkit-text-stroke: 2.75px #3333337F;
+	                -webkit-text-fill-color: transparent;
+                    
+                    padding-right: 5px;
+                    padding-left: 5px;
+
+                    font-family: 'Kalam';
+                    font-size: 48px;
+                    font-weight: normal;
+
+                    ">Skyarc</span>`,
+
+            title2: `<span style="
+                    paint-order: stroke markers fill;
+	                -webkit-text-fill-color: transparent;
+
+                    background-clip: text;
+	                background-image: -webkit-linear-gradient(98deg, #54df7e 18%, #98f570 60%);
+                    
+                    padding-right: 5px;
+                    padding-left: 5px;
+
+                    font-family: 'Kalam';
+                    font-size: 48px;
+                    font-weight: normal;
+
+                    ">Skyarc</span>`,
+        },
+        {
+            id: "mirrorLogo",
+            position: transCoord(6300,2750),
+            contentKey: "mirror",
+            name: "The Mirror",
+            title: `<span style="
+                    paint-order: stroke markers fill;
+                    -webkit-text-stroke: 2.75px #3333337F;
+	                -webkit-text-fill-color: transparent;
+                    
+                    padding-right: 5px;
+                    padding-left: 5px;
+
+                    font-family: 'Michroma';
+                    font-size: 32px;
+                    font-weight: normal;
+
+                    ">THE MIRROR</span>`,
+
+            title2: `<span style="
+                    paint-order: stroke markers fill;
+	                -webkit-text-fill-color: transparent;
+
+                    background-clip: text;
+	                background-image: -webkit-linear-gradient(90deg, #006699 15%, #17d3f4 62%);
+                    
+                    padding-right: 5px;
+                    padding-left: 5px;
+
+                    font-family: 'Michroma';
+                    font-size: 32px;
+                    font-weight: normal;
+
+                    ">THE MIRROR</span>`,
+        },
+        {
+            id: "citraLogo",
+            position: transCoord(6080,3935),
+            contentKey: "citra",
+            name: "Citra",
+            title: `<span style="
+                    paint-order: stroke markers fill;
+                    -webkit-text-stroke: 2.75px #3333337F;
+	                -webkit-text-fill-color: transparent;
+
+                    padding-right: 5px;
+                    padding-left: 5px;
+
+                    font-family: 'Comic Neue Angular';
+                    font-size: 48px;
+                    font-weight: bold;
+
+                    ">citra</span>`,
+            title2: `<span style="
+                    paint-order: stroke markers fill;
+	                -webkit-text-fill-color: transparent;
+
+                    background-clip: text;
+	                background-image: -webkit-linear-gradient(99deg, #bdd8de 10%, #ffffff 47%);
+                    
+                    padding-right: 5px;
+                    padding-left: 5px;
+
+                    font-family: 'Comic Neue Angular';
+                    font-size: 48px;
+                    font-weight: bold;
+
+                    ">citra</span>`,
+        },
+        {
+            id: "axiomLogo",
+            position: transCoord(6290,1600),
+            contentKey: "axiom",
+            name: "Axiom",
+            title: `<span style="
+                    paint-order: stroke markers fill;
+                    -webkit-text-stroke: 2.75px #3333337F;
+	                -webkit-text-fill-color: transparent;
+
+                    padding-right: 5px;
+                    padding-left: 5px;
+
+                    font-family: 'Quicksand';
+                    font-size: 36px;
+                    font-weight: normal;
+
+                    ">AXIOM</span>`,
+            title2: `<span style="
+                    paint-order: stroke markers fill;
+	                -webkit-text-fill-color: transparent;
+
+                    background-clip: text;
+	                background-image: -webkit-linear-gradient(90deg, #FF6EFF 15%, #F5A9B8 62%);
+                    
+                    padding-right: 5px;
+                    padding-left: 5px;
+
+                    font-family: 'Quicksand';
+                    font-size: 36px;
+                    font-weight: normal;
+
+                    ">AXIOM</span>`,
+        },
+        {
+            id: "vertexLogo",
+            position: transCoord(4210,3460),
+            contentKey: "vertex",
+            name: "Vertex",
+            title: `<span style="
+                    paint-order: stroke markers fill;
+                    -webkit-text-stroke: 2.75px #3333337F;
+	                -webkit-text-fill-color: transparent;
+
+                    padding-right: 5px;
+                    padding-left: 5px;
+
+                    font-family: 'Quicksand';
+                    font-size: 36px;
+                    font-weight: normal;
+
+                    ">VERTEX</span>`,
+            title2: `<span style="
+                    paint-order: stroke markers fill;
+	                -webkit-text-fill-color: transparent;
+
+                    background-clip: text;
+	                background-image: -webkit-linear-gradient(90deg, #4489ab 15%, #99C4E8 62%);
+                    
+                    padding-right: 5px;
+                    padding-left: 5px;
+
+                    font-family: 'Quicksand';
+                    font-size: 36px;
+                    font-weight: normal;
+
+                    ">VERTEX</span>`,
+        }
+    ];
     
     
     var sidebarContents = {
@@ -2523,8 +2848,7 @@
                     hold its own jurisdiction.
                      </span></p>
             `
-        },
-        
+        },     
     };
 
 
@@ -2948,6 +3272,32 @@
         staticLabelStore.push({marker, id: staticLabel.id});
     });
 
+    let clickableLabelMainStore = [];
+    clickableLabelsMain.forEach(clickableLabel => {
+
+        var label = L.divIcon({
+            className: "clickable-label-main",
+            html: clickableLabel.title,
+            iconSize: [10,14],
+            iconAnchor: [5,7]
+        });
+
+        var marker = L.marker(clickableLabel.position, {icon: label, interactive:true}).addTo(map).setZIndexOffset(8800);
+        clickableLabelMainStore.push({marker, id: clickableLabel.id});
+        marker.on("click", function () {openSidebar(clickableLabel.contentKey); if(selectedPOI){deselectPOI(); goalDelete();}});
+
+        var label2 = L.divIcon({
+            className: "clickable-label-main",
+            html: clickableLabel.title2,
+            iconSize: [10,14],
+            iconAnchor: [5,7]
+        });
+
+        var marker = L.marker(clickableLabel.position, {icon: label2, interactive:false}).addTo(map).setZIndexOffset(8900);
+
+
+    });
+
     // Function to open the sidebar with specific content
     function openSidebar(contentKey) {
         var content = sidebarContents[contentKey];
@@ -2998,7 +3348,7 @@
     }
 
     // add labels at positions
-    var labelFragment = createLabel(flipY(2140), 5120, "FRAGMENT", "Merriweather", "regular", 0, "orange", 38);
+    /*var labelFragment = createLabel(flipY(2140), 5120, "FRAGMENT", "Merriweather", "regular", 0, "orange", 38);
     var labelSkyarc = createLabel(flipY(3940), 4165,  "Skyarc", "Kalam", "regular", 0, "#32FF3D", 48);
     var labelMirror = createLabel(flipY(2750), 6300,  "THE MIRROR", "Michroma", "regular", 0, "cyan", 32);
     var labelCitra = createLabel(flipY(3935), 6080,  "citra", "Comic Neue Angular", "bold", 0, "gold", 50);
@@ -3006,12 +3356,12 @@
     var labelDirwik = createLabel(flipY(2785), 2860,  "DIRWIK", "Balthazar", "regular", 0, "#0091D2", 42);
     var labelStack = createLabel(flipY(1010), 3920,  "STACK", "Inconsolatazi4varl_qu", "regular", 0, "#D800FF", 48);
     var labelAxiom = createLabel(flipY(1600), 6290,  "AXIOM", "Quicksand", "regular", 0, "#FF6EFF", 38);
-    var labelVertex = createLabel(flipY(3460), 4210,  "VERTEX", "Quicksand", "regular", 0, "#8BB2D3", 36);
+    var labelVertex = createLabel(flipY(3460), 4210,  "VERTEX", "Quicksand", "regular", 0, "#8BB2D3", 36);*/
 
 
     
     // open sidebar on click
-    labelFragment.on("click", function () {openSidebar("fragment"); if(selectedPOI){deselectPOI(); goalDelete();} console.log("Fragment clicked!");});
+    /*labelFragment.on("click", function () {openSidebar("fragment"); if(selectedPOI){deselectPOI(); goalDelete();} console.log("Fragment clicked!");});
     labelSkyarc.on("click", function () {openSidebar("skyarc"); if(selectedPOI){deselectPOI(); goalDelete();} console.log("Skyarc clicked!");});
     labelMirror.on("click", function () {openSidebar("mirror"); if(selectedPOI){deselectPOI(); goalDelete();} console.log("The Mirror clicked!");});
     labelCitra.on("click", function () {openSidebar("citra"); if(selectedPOI){deselectPOI(); goalDelete();} console.log("Citra clicked!");});
@@ -3019,7 +3369,7 @@
     labelDirwik.on("click", function () {openSidebar("dirwik"); if(selectedPOI){deselectPOI(); goalDelete();} console.log("Dirwik clicked!");});
     labelStack.on("click", function () {openSidebar("stack"); if(selectedPOI){deselectPOI(); goalDelete();} console.log("Stack clicked!");});
     labelAxiom.on("click", function () {openSidebar("axiom"); if(selectedPOI){deselectPOI(); goalDelete();} console.log("Axiom clicked!");});
-    labelVertex.on("click", function () {openSidebar("vertex"); if(selectedPOI){deselectPOI(); goalDelete();} console.log("Vertex clicked!");});
+    labelVertex.on("click", function () {openSidebar("vertex"); if(selectedPOI){deselectPOI(); goalDelete();} console.log("Vertex clicked!");});*/
     
     // static labels
 
@@ -3234,8 +3584,7 @@
     updatePOIOpacity();
     
 
-    map.options.wheelPxPerZoomLevel = 120; // Adjust for finer control (default is 60)
-
+    map.options.wheelPxPerZoomLevel = 120; // adjust for finer control (default is 60)
 
 </script>
 
