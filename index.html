@@ -109,11 +109,7 @@
             paint-order: stroke fill;
         }
 
-        /*.poi-tooltip:hover,
-        .poi-tooltip-second:hover {
-            opacity: 0.2 !important; /* Make the tooltip transparent 
-            transition: opacity 0.2s ease-in-out;
-        }*/
+    
 
         /* reenable for web deployment*/
         
@@ -212,6 +208,7 @@
         attributionControl: false, // Disable the white bar caused by attribution
         maxBounds: bounds, // Restricts panning to the image
         maxBoundsViscosity: 1.0 // Fully locks panning within bounds
+        ,renderer: L.svg({padding: 1}) // fixes polygon clipping
     });
 
     // Add the image as a layer
@@ -333,6 +330,7 @@
 
 
     var fragment = L.polygon(fragmentOriginalCoords.map(([x, y]) => [flipY(y), x ]), {
+        noClip: true,
         color: "white",       // Outline color
         fillColor: "orange", // Fill color
         fillOpacity: 0.2     // Transparency
@@ -340,6 +338,7 @@
     fragment.bindPopup("Fragment");
 
     var skyarc = L.polygon(skyarcOriginalCoords.map(([x, y]) => [flipY(y), x ]), {
+        noClip: true,
         color: "white",       // Outline color
         fillColor: "green", // Fill color
         fillOpacity: 0.2     // Transparency
@@ -347,6 +346,7 @@
     skyarc.bindPopup("Skyarc");
 
     var downtown = L.polygon(downtownOriginalCoords.map(([x, y]) => [flipY(y), x ]), {
+        noClip: true,
         color: "white",       // Outline color
         fillColor: "#AFA5FF", // Fill color
         fillOpacity: 0.2     // Transparency
@@ -354,6 +354,7 @@
     downtown.bindPopup("Downtown");
 
     var citra = L.polygon(citraOriginalCoords.map(([x, y]) => [flipY(y), x ]), {
+        noClip: true,
         color: "white",       // Outline color
         fillColor: "gold", // Fill color
         fillOpacity: 0.2     // Transparency
@@ -361,6 +362,7 @@
     citra.bindPopup("Citra");
 
     var mirror = L.polygon(mirrorOriginalCoords.map(([x, y]) => [flipY(y), x ]), {
+        noClip: true,
         color: "white",       // Outline color
         fillColor: "cyan", // Fill color
         fillOpacity: 0.2     // Transparency
@@ -368,6 +370,7 @@
     mirror.bindPopup("The Mirror");
 
     var axiom = L.polygon(axiomOriginalCoords.map(([x, y]) => [flipY(y), x ]), {
+        noClip: true,
         color: "white",       // Outline color
         fillColor: "pink", // Fill color
         fillOpacity: 0.2     // Transparency
@@ -375,6 +378,7 @@
     axiom.bindPopup("Axiom");
 
     var stack = L.polygon(stackOriginalCoords.map(([x, y]) => [flipY(y), x ]), {
+        noClip: true,
         color: "white",       // Outline color
         fillColor: "purple", // Fill color
         fillOpacity: 0.2     // Transparency
@@ -382,6 +386,7 @@
     stack.bindPopup("Stack");
 
     var dirwik = L.polygon(dirwikOriginalCoords.map(([x, y]) => [flipY(y), x ]), {
+        noClip: true,
         color: "white",       // Outline color
         fillColor: "blue", // Fill color
         fillOpacity: 0.2     // Transparency
@@ -389,7 +394,7 @@
     dirwik.bindPopup("Dirwik");
 
 
-
+    
 
     var poiIcons = {
         "sync": L.icon({
@@ -481,26 +486,6 @@
 
 
 
-
-
-
-    /* POI Data (similar to labels, but using icons)
-    var poiData = [
-        {
-            id: "cloverDrift",
-            x: 3277, // X Position
-            y: 3137, // Y Position
-            icon: "images/icons/sync.png", // Icon Image
-            sidebarKey: "cloverDrift" // Links to sidebar content
-        },
-        {
-            id: "remnant",
-            x: 4445,
-            y: 2349,
-            icon: "images/icons/sync.png",
-            sidebarKey: "remnant"
-        }
-    ];*/
 
     var syncs = [
         //syncs
@@ -2342,6 +2327,18 @@
     var staticLabels = [
         //downtown
         {
+            id: "downtownApollo",
+            position: transCoord(3729,3051),
+            name: "Apollo",
+            title: `<span style="color: #FAFAFB; font-family: 'Jura'; font-size: 14px; font-weight: normal;">Apollo</span>`,
+        },
+        {
+            id: "downtownGym",
+            position: transCoord(4220,2473),
+            name: "Gym",
+            title: `<span style="color: #FAFAFB; font-family: 'Jura'; font-size: 14px; font-weight: normal;">Gym</span>`,
+        },
+        {
             id: "downtownIndustrialBuffer",
             position: transCoord(3751,1634),
             name: "Industrial Gateway",
@@ -2353,7 +2350,37 @@
             name: "Spawn Area",
             title: `<span style="color: #FAFAFB; font-family: 'Jura'; font-size: 14px; font-weight: normal;">Spawn Area</span>`,
         },
+        {
+            id: "downtownVertigo",
+            position: transCoord(4334,1780),
+            name: "Vertigo",
+            title: `<span style="color: #FAFAFB; font-family: 'Jura'; font-size: 14px; font-weight: normal;">Vertigo</span>`,
+        },
         //dirwik
+        {
+            id: "dirwikAirflowBlue",
+            position: transCoord(2642,3055),
+            name: "Airflow Blue",
+            title: `<span style="color: #FAFAFB; font-family: 'Jura'; font-size: 14px; font-weight: normal;">Airflow Blue</span>`,
+        },
+        {
+            id: "dirwikAirflowOrange",
+            position: transCoord(2483,1919),
+            name: "Airflow Orange",
+            title: `<span style="color: #FAFAFB; font-family: 'Jura'; font-size: 14px; font-weight: normal;">Airflow Orange</span>`,
+        },
+        {
+            id: "dirwikArtemisTower",
+            position: transCoord(2844,3466),
+            name: "Artemis Tower Complex",
+            title: `<span style="color: #FAFAFB; font-family: 'Jura'; font-size: 14px; font-weight: normal;">Artemis<br>Tower Complex</span>`,
+        },
+        {
+            id: "dirwikCake",
+            position: transCoord(2875,1676),
+            name: "Dirwik Cake",
+            title: `<span style="color: #FAFAFB; font-family: 'Jura'; font-size: 14px; font-weight: normal;">Dirwik Cake</span>`,
+        },
         {
             id: "dirwikCelestialComplex",
             position: transCoord(2809,2496),
@@ -2373,10 +2400,40 @@
             title: `<span style="color: #FAFAFB; font-family: 'Jura'; font-size: 14px; font-weight: normal;">Dirwik Corridor</span>`,
         },
         {
+            id: "dirwikEntranceNorth",
+            position: transCoord(3293,1937),
+            name: "Dirwik North Entrance",
+            title: `<span style="color: #FAFAFB; font-family: 'Jura'; font-size: 14px; font-weight: normal;">Dirwik<br>North Entrance</span>`,
+        },
+        {
+            id: "dirwikEntranceSouth",
+            position: transCoord(3357,3187),
+            name: "Dirwik South Entrance",
+            title: `<span style="color: #FAFAFB; font-family: 'Jura'; font-size: 14px; font-weight: normal;">Dirwik<br>South Entrance</span>`,
+        },
+        {
+            id: "dirwikHighpoint",
+            position: transCoord(2898,3281),
+            name: "The Highpoint",
+            title: `<span style="color: #FAFAFB; font-family: 'Jura'; font-size: 14px; font-weight: normal;">The Highpoint</span>`,
+        },
+        {
+            id: "dirwikIndustrialBuffer",
+            position: transCoord(2782,1196),
+            name: "Industrial Park",
+            title: `<span style="color: #FAFAFB; font-family: 'Jura'; font-size: 14px; font-weight: normal;">Industrial Park</span>`,
+        },
+        {
             id: "dirwikNimbusComplex",
             position: transCoord(2724,2216),
             name: "Nimbus Complex",
             title: `<span style="color: #FAFAFB; font-family: 'Jura'; font-size: 14px; font-weight: normal;">Nimbus<br>Complex</span>`,
+        },
+        {
+            id: "dirwikPRK",
+            position: transCoord(3038,2253),
+            name: "PRK Tech",
+            title: `<span style="color: #FAFAFB; font-family: 'Jura'; font-size: 14px; font-weight: normal;">PRK Tech</span>`,
         },
         {
             id: "dirwikSuburbsSW",
@@ -2384,6 +2441,7 @@
             name: "Suburbs",
             title: `<span style="color: #FAFAFB; font-family: 'Jura'; font-size: 14px; font-weight: normal;">Suburbs</span>`,
         },
+        
         
         //fragment
         {
@@ -2397,6 +2455,12 @@
             position: transCoord(5384,1111),
             name: "Highrise Sector",
             title: `<span style="color: #FAFAFB; font-family: 'Jura'; font-size: 14px; font-weight: normal;">Highrise Sector</span>`,
+        },
+        {
+            id: "fragmentTimesSquare",
+            position: transCoord(5286,2031),
+            name: "Times Square",
+            title: `<span style="color: #FAFAFB; font-family: 'Jura'; font-size: 14px; font-weight: normal;">Times Square</span>`,
         },
 
         //stack
@@ -2909,7 +2973,7 @@
 
         marker.on("mouseover", function() {
             isWaitingUnrender=false;
-            if (!sync.isSelected) {
+            if (!sync.isSelected&&!isMobile) {
                 firstTooltip.setLatLng(marker.getLatLng());
                 map.addLayer(firstTooltip);
 
@@ -2955,6 +3019,18 @@
             if (!isWaitingUnrender&&!sync.isSelected&&isMobile) {
                 removeTooltipListeners(firstTooltip); 
                 map.removeLayer(firstTooltip);    
+            }
+
+            if (isMobile&&sync.isSelected) {
+                firstTooltip.setLatLng(marker.getLatLng());
+                map.addLayer(firstTooltip);
+
+                // handle tooltips
+                isForcedTransparent=false;
+                restoreTooltipOpacity(firstTooltip);
+                firstTooltip._container.addEventListener('click', () => handleTooltipClick(firstTooltip));
+                firstTooltip._container.addEventListener('mouseover', () => handleTooltipOnHover(firstTooltip));
+                firstTooltip._container.addEventListener('mouseout', () => handleTooltipOnLeave(firstTooltip));
             }
         });
     });
@@ -3019,7 +3095,7 @@
 
         marker.on("mouseover", function() {
             isWaitingUnrender=false;
-            if (!trial.isSelected) {
+            if (!trial.isSelected&&!isMobile) {
                 firstTooltip.setLatLng(marker.getLatLng());
                 map.addLayer(firstTooltip);
 
@@ -3076,9 +3152,29 @@
             document.getElementById('sidebar-content').innerHTML = trial.content;
 
             if (!isWaitingUnrender&&!trial.isSelected&&isMobile) {
+                console.log("Mobile - trial deselected, removing tooltips");
                 removeTooltipListeners(firstTooltip,secondTooltip); 
                 map.removeLayer(firstTooltip);    
                 map.removeLayer(secondTooltip);
+            }
+
+            if (isMobile&&trial.isSelected) {
+                firstTooltip.setLatLng(marker.getLatLng());
+                map.addLayer(firstTooltip);
+
+                secondTooltip.setLatLng(marker.getLatLng());
+                map.addLayer(secondTooltip);
+
+                // handle tooltips
+                isForcedTransparent=false;
+                restoreTooltipOpacity(firstTooltip);
+                restoreTooltipOpacity(secondTooltip);
+                firstTooltip._container.addEventListener('click', () => handleTooltipClick(firstTooltip));
+                secondTooltip._container.addEventListener('click', () => handleTooltipClick(secondTooltip));
+                firstTooltip._container.addEventListener('mouseover', () => handleTooltipOnHover(firstTooltip));
+                secondTooltip._container.addEventListener('mouseover', () => handleTooltipOnHover(secondTooltip));
+                firstTooltip._container.addEventListener('mouseout', () => handleTooltipOnLeave(firstTooltip));
+                secondTooltip._container.addEventListener('mouseout', () => handleTooltipOnLeave(secondTooltip));
             }
         });
 
@@ -3145,7 +3241,7 @@
 
         marker.on("mouseover", function() {
             isWaitingUnrender=false;
-            if (!challenge.isSelected) {
+            if (!challenge.isSelected&&!isMobile) {
                 firstTooltip.setLatLng(marker.getLatLng());
                 map.addLayer(firstTooltip);
 
@@ -3202,6 +3298,25 @@
                 removeTooltipListeners(firstTooltip,secondTooltip); 
                 map.removeLayer(firstTooltip);    
                 map.removeLayer(secondTooltip);
+            }
+
+            if (isMobile&&challenge.isSelected) {
+                firstTooltip.setLatLng(marker.getLatLng());
+                map.addLayer(firstTooltip);
+
+                secondTooltip.setLatLng(marker.getLatLng());
+                map.addLayer(secondTooltip);
+
+                // handle tooltips
+                isForcedTransparent=false;
+                restoreTooltipOpacity(firstTooltip);
+                restoreTooltipOpacity(secondTooltip);
+                firstTooltip._container.addEventListener('click', () => handleTooltipClick(firstTooltip));
+                secondTooltip._container.addEventListener('click', () => handleTooltipClick(secondTooltip));
+                firstTooltip._container.addEventListener('mouseover', () => handleTooltipOnHover(firstTooltip));
+                secondTooltip._container.addEventListener('mouseover', () => handleTooltipOnHover(secondTooltip));
+                firstTooltip._container.addEventListener('mouseout', () => handleTooltipOnLeave(firstTooltip));
+                secondTooltip._container.addEventListener('mouseout', () => handleTooltipOnLeave(secondTooltip));
             }
         });
     });
@@ -3347,33 +3462,6 @@
         //return L.marker([lat, lng], { icon: label }).addTo(map);
     }
 
-    // add labels at positions
-    /*var labelFragment = createLabel(flipY(2140), 5120, "FRAGMENT", "Merriweather", "regular", 0, "orange", 38);
-    var labelSkyarc = createLabel(flipY(3940), 4165,  "Skyarc", "Kalam", "regular", 0, "#32FF3D", 48);
-    var labelMirror = createLabel(flipY(2750), 6300,  "THE MIRROR", "Michroma", "regular", 0, "cyan", 32);
-    var labelCitra = createLabel(flipY(3935), 6080,  "citra", "Comic Neue Angular", "bold", 0, "gold", 50);
-    var labelDowntown = createLabel(flipY(2235), 4000,  "DOWNTOWN", "Sarpanch", "regular", 1, "#7AE0FF", 38);
-    var labelDirwik = createLabel(flipY(2785), 2860,  "DIRWIK", "Balthazar", "regular", 0, "#0091D2", 42);
-    var labelStack = createLabel(flipY(1010), 3920,  "STACK", "Inconsolatazi4varl_qu", "regular", 0, "#D800FF", 48);
-    var labelAxiom = createLabel(flipY(1600), 6290,  "AXIOM", "Quicksand", "regular", 0, "#FF6EFF", 38);
-    var labelVertex = createLabel(flipY(3460), 4210,  "VERTEX", "Quicksand", "regular", 0, "#8BB2D3", 36);*/
-
-
-    
-    // open sidebar on click
-    /*labelFragment.on("click", function () {openSidebar("fragment"); if(selectedPOI){deselectPOI(); goalDelete();} console.log("Fragment clicked!");});
-    labelSkyarc.on("click", function () {openSidebar("skyarc"); if(selectedPOI){deselectPOI(); goalDelete();} console.log("Skyarc clicked!");});
-    labelMirror.on("click", function () {openSidebar("mirror"); if(selectedPOI){deselectPOI(); goalDelete();} console.log("The Mirror clicked!");});
-    labelCitra.on("click", function () {openSidebar("citra"); if(selectedPOI){deselectPOI(); goalDelete();} console.log("Citra clicked!");});
-    labelDowntown.on("click", function () {openSidebar("downtown"); if(selectedPOI){deselectPOI(); goalDelete();} console.log("Downtown clicked!");});
-    labelDirwik.on("click", function () {openSidebar("dirwik"); if(selectedPOI){deselectPOI(); goalDelete();} console.log("Dirwik clicked!");});
-    labelStack.on("click", function () {openSidebar("stack"); if(selectedPOI){deselectPOI(); goalDelete();} console.log("Stack clicked!");});
-    labelAxiom.on("click", function () {openSidebar("axiom"); if(selectedPOI){deselectPOI(); goalDelete();} console.log("Axiom clicked!");});
-    labelVertex.on("click", function () {openSidebar("vertex"); if(selectedPOI){deselectPOI(); goalDelete();} console.log("Vertex clicked!");});*/
-    
-    // static labels
-
-    // ---------------------------------------------------
 
     function updateSyncOpacity() {
         let zoomLevel = map.getZoom();
@@ -3485,20 +3573,7 @@
         console.log(raceSize);
         if (goalMarker[0]==null||goalMarker==[]) {return;}
         //console.log(goalMarker);
-        /*if (!race) {return;}
-        if (raceSize==1) {raceType="trial";}
-        if (raceSize>=2) {raceType="challenge";}
 
-        if (raceType=="trial") {
-            //console.log(goalMarker[0].getLatLng());
-            map.removeLayer(goalMarker[0]);
-        }
-
-        if (raceType="challenge") {
-            for (let i = 0; i < raceSize; i++) {
-                map.removeLayer(goalMarker[i]);
-            }
-        }*/
         if (!goalMarkerDeleting) {
             goalMarkerAux=goalMarker;
             goalMarkerDeleting=true;
@@ -3563,6 +3638,24 @@
         //if (goalMarker) map.removeLayer(goalMarker);
     }
 
+
+    function superChangelog64() {
+        if (!isMobile) { //added kill mobile
+            document.getElementById("sidebar-title").innerHTML = `
+            <span style="font-family: 'Comic Neue Angular'; color: #A17FFF; font-size: 32px; font-weight: normal;">Super Changelog 64</span>`;
+            document.getElementById("sidebar-content").innerHTML = `
+                <p><span style="font-family: 'Jura'; color: white; font-size: 18px;">Not quite a changelog for now.<br><br>I finally
+                    have an idea on how to make this work!<br>I know Dirwik's looking a bit cluttered right now, but once I get layers
+                    working, it should help with filtering rendering by zoom, rendering by manual filters, and improve performance.<br><br>
+                    ETA: no idea :c (I can barely code)
+                    </span></p>
+            `;
+            document.getElementById("sidebar").style.right = "0px"; // Slide out 
+        }
+        openSidebarA();
+    }
+
+
     map.on("zoom", function () {
         let zoomLevel = map.getZoom();
         document.querySelectorAll(".custom-label span").forEach(label => {
@@ -3578,13 +3671,16 @@
         updatePOIOpacity();
     });
 
+    
     updateSyncOpacity();
     updateTrialOpacity();
     updateChallengeOpacity();
     updatePOIOpacity();
-    
 
     map.options.wheelPxPerZoomLevel = 120; // adjust for finer control (default is 60)
+
+
+    superChangelog64();
 
 </script>
 
