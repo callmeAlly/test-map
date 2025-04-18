@@ -211,8 +211,7 @@
             attributionControl: false, // Disable the white bar caused by attribution
             maxBounds: bounds, // Restricts panning to the image
             maxBoundsViscosity: 1.0 // Fully locks panning within bounds
-            ,renderer: L.canvas()
-            ,preferCanvas: true
+            ,renderer: L.svg({padding: 5})
         });
     } else {
         map = L.map('map', {
@@ -3377,8 +3376,8 @@
             //document.getElementById("sidebar").style.right = "0px"; // Slide out 
         });
     });
-/*
 
+	
     function restoreTooltipOpacity (tooltip){
         tooltip.setOpacity("0.9");
     };
@@ -3429,7 +3428,7 @@
 
 
     });
-*/
+
     // Function to open the sidebar with specific content
     function openSidebar(contentKey) {
         var content = sidebarContents[contentKey];
