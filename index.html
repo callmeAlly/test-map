@@ -199,17 +199,33 @@
 
 
     // Initialize the map
-    var map = L.map('map', {
-        crs: L.CRS.Simple, // Use simple coordinate system
-        minZoom: -2, // Allow zooming out
-        maxZoom: 1.3,  // Prevents excessive zooming in
-        zoomSnap: 0.3, // Allows zooming at 0.1 increments instead of rounding
-        zoomDelta: 0.3, // Enables smoother zoom transitions
-        attributionControl: false, // Disable the white bar caused by attribution
-        maxBounds: bounds, // Restricts panning to the image
-        maxBoundsViscosity: 1.0 // Fully locks panning within bounds
-        ,renderer: L.svg({padding: 1}) // fixes polygon clipping
-    });
+    var map = null;
+
+    if (isMobile) {
+        map = L.map('map', {
+            crs: L.CRS.Simple, // Use simple coordinate system
+            minZoom: -2, // Allow zooming out
+            maxZoom: 1.3,  // Prevents excessive zooming in
+            zoomSnap: 0.3, // Allows zooming at 0.1 increments instead of rounding
+            zoomDelta: 0.3, // Enables smoother zoom transitions
+            attributionControl: false, // Disable the white bar caused by attribution
+            maxBounds: bounds, // Restricts panning to the image
+            maxBoundsViscosity: 1.0 // Fully locks panning within bounds
+            ,renderer: L.svg() 
+        });
+    } else {
+        map = L.map('map', {
+            crs: L.CRS.Simple, // Use simple coordinate system
+            minZoom: -2, // Allow zooming out
+            maxZoom: 1.3,  // Prevents excessive zooming in
+            zoomSnap: 0.3, // Allows zooming at 0.1 increments instead of rounding
+            zoomDelta: 0.3, // Enables smoother zoom transitions
+            attributionControl: false, // Disable the white bar caused by attribution
+            maxBounds: bounds, // Restricts panning to the image
+            maxBoundsViscosity: 1.0 // Fully locks panning within bounds
+            ,renderer: L.svg({padding: 1}) // fixes polygon clipping
+        });
+    }
 
     // Add the image as a layer
     L.imageOverlay('MapBase.png', bounds).addTo(map);
