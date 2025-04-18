@@ -211,7 +211,8 @@
             attributionControl: false, // Disable the white bar caused by attribution
             maxBounds: bounds, // Restricts panning to the image
             maxBoundsViscosity: 1.0 // Fully locks panning within bounds
-            ,renderer: L.svg() 
+            ,renderer: L.canvas()
+            ,preferCanvas: true
         });
     } else {
         map = L.map('map', {
