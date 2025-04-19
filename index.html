@@ -525,7 +525,7 @@
         let zoomLevel = map.getZoom();
         
 
-        for (let store of [trialStore, challengeStore, syncStore]) {
+        for (let store of [trialStore, challengeStore, syncStore, staticLabelStore]) {
             store.forEach(item => {
                 let shouldBeVisible = activeLayers[item.layerType] && bounds.contains(item.marker.getLatLng());
 
@@ -548,6 +548,29 @@
                 }
             });
         }
+
+        /*for (let store of [staticLabelStore]) {
+            store.forEach(item => {
+                let shouldBeVisible = activeLayers[item.layerType] && bounds.contains(item.marker.getLatLng());
+
+                if (shouldBeVisible && !item.visible && (zoomLevel >= item.data.zoomThreshold)) {
+                    item.marker.addTo(map).setZIndexOffset(9000).setOpacity(0);
+                    setTimeout(function() {
+                        item.marker.setOpacity(1);
+                    }, 20);
+                    
+                    item.visible = true;
+                }
+                if ((!shouldBeVisible && item.visible) || (item.visible && zoomLevel < item.data.zoomThreshold)) {
+                    item.marker.setOpacity(0);
+                    
+                    setTimeout(function() {
+                        map.removeLayer(item.marker);
+                    }, 500);
+                    item.visible = false;
+                }
+            });
+        }*/
     };
 
         
@@ -2553,30 +2576,40 @@
         {
             id: "downtownApollo",
             position: transCoord(3729,3051),
+            typeIdentifier: '[staticLabel]',
+            zoomThreshold: -2,
             name: "Apollo",
             title: `<span style="color: #FAFAFB; font-family: 'Jura'; font-size: 14px; font-weight: normal;">Apollo</span>`,
         },
         {
             id: "downtownGym",
             position: transCoord(4220,2473),
+            typeIdentifier: '[staticLabel]',
+            zoomThreshold: -2,
             name: "Gym",
             title: `<span style="color: #FAFAFB; font-family: 'Jura'; font-size: 14px; font-weight: normal;">Gym</span>`,
         },
         {
             id: "downtownIndustrialBuffer",
             position: transCoord(3751,1634),
+            typeIdentifier: '[staticLabel]',
+            zoomThreshold: -2,
             name: "Industrial Gateway",
             title: `<span style="color: #FAFAFB; font-family: 'Jura'; font-size: 14px; font-weight: normal;">Industrial Gateway</span>`,
         },
         {
             id: "downtownSpawnArea",
             position: transCoord(4378,2120),
+            typeIdentifier: '[staticLabel]',
+            zoomThreshold: -2,
             name: "Spawn Area",
             title: `<span style="color: #FAFAFB; font-family: 'Jura'; font-size: 14px; font-weight: normal;">Spawn Area</span>`,
         },
         {
             id: "downtownVertigo",
             position: transCoord(4334,1780),
+            typeIdentifier: '[staticLabel]',
+            zoomThreshold: -2,
             name: "Vertigo",
             title: `<span style="color: #FAFAFB; font-family: 'Jura'; font-size: 14px; font-weight: normal;">Vertigo</span>`,
         },
@@ -2584,84 +2617,112 @@
         {
             id: "dirwikAirflowBlue",
             position: transCoord(2642,3055),
+            typeIdentifier: '[staticLabel]',
+            zoomThreshold: -2,
             name: "Airflow Blue",
             title: `<span style="color: #FAFAFB; font-family: 'Jura'; font-size: 14px; font-weight: normal;">Airflow Blue</span>`,
         },
         {
             id: "dirwikAirflowOrange",
             position: transCoord(2483,1919),
+            typeIdentifier: '[staticLabel]',
+            zoomThreshold: -2,
             name: "Airflow Orange",
             title: `<span style="color: #FAFAFB; font-family: 'Jura'; font-size: 14px; font-weight: normal;">Airflow Orange</span>`,
         },
         {
             id: "dirwikArtemisTower",
             position: transCoord(2844,3466),
+            typeIdentifier: '[staticLabel]',
+            zoomThreshold: -2,
             name: "Artemis Tower Complex",
             title: `<span style="color: #FAFAFB; font-family: 'Jura'; font-size: 14px; font-weight: normal;">Artemis<br>Tower Complex</span>`,
         },
         {
             id: "dirwikCake",
             position: transCoord(2875,1676),
+            typeIdentifier: '[staticLabel]',
+            zoomThreshold: -2,
             name: "Dirwik Cake",
             title: `<span style="color: #FAFAFB; font-family: 'Jura'; font-size: 14px; font-weight: normal;">Dirwik Cake</span>`,
         },
         {
             id: "dirwikCelestialComplex",
             position: transCoord(2809,2496),
+            typeIdentifier: '[staticLabel]',
+            zoomThreshold: -2,
             name: "Celestial Complex",
             title: `<span style="color: #FAFAFB; font-family: 'Jura'; font-size: 14px; font-weight: normal;">Celestial<br>Complex</span>`,
         },
         {
             id: "dirwikConstructionComplex",
             position: transCoord(3113,4187),
+            typeIdentifier: '[staticLabel]',
+            zoomThreshold: -2,
             name: "Dirwik Construction Complex",
             title: `<span style="color: #FAFAFB; font-family: 'Jura'; font-size: 14px; font-weight: normal;">Dirwik Construction<br>Complex</span>`,
         },
         {
             id: "dirwikCorridor",
             position: transCoord(3182,2398),
+            typeIdentifier: '[staticLabel]',
+            zoomThreshold: -2,
             name: "Dirwik Corridor",
             title: `<span style="color: #FAFAFB; font-family: 'Jura'; font-size: 14px; font-weight: normal;">Dirwik Corridor</span>`,
         },
         {
             id: "dirwikEntranceNorth",
             position: transCoord(3293,1937),
+            typeIdentifier: '[staticLabel]',
+            zoomThreshold: -2,
             name: "Dirwik North Entrance",
             title: `<span style="color: #FAFAFB; font-family: 'Jura'; font-size: 14px; font-weight: normal;">Dirwik<br>North Entrance</span>`,
         },
         {
             id: "dirwikEntranceSouth",
             position: transCoord(3357,3187),
+            typeIdentifier: '[staticLabel]',
+            zoomThreshold: -2,
             name: "Dirwik South Entrance",
             title: `<span style="color: #FAFAFB; font-family: 'Jura'; font-size: 14px; font-weight: normal;">Dirwik<br>South Entrance</span>`,
         },
         {
             id: "dirwikHighpoint",
             position: transCoord(2898,3281),
+            typeIdentifier: '[staticLabel]',
+            zoomThreshold: -2,
             name: "The Highpoint",
             title: `<span style="color: #FAFAFB; font-family: 'Jura'; font-size: 14px; font-weight: normal;">The Highpoint</span>`,
         },
         {
             id: "dirwikIndustrialBuffer",
             position: transCoord(2782,1196),
+            typeIdentifier: '[staticLabel]',
+            zoomThreshold: -2,
             name: "Industrial Park",
             title: `<span style="color: #FAFAFB; font-family: 'Jura'; font-size: 14px; font-weight: normal;">Industrial Park</span>`,
         },
         {
             id: "dirwikNimbusComplex",
             position: transCoord(2724,2216),
+            typeIdentifier: '[staticLabel]',
+            zoomThreshold: -2,
             name: "Nimbus Complex",
             title: `<span style="color: #FAFAFB; font-family: 'Jura'; font-size: 14px; font-weight: normal;">Nimbus<br>Complex</span>`,
         },
         {
             id: "dirwikPRK",
             position: transCoord(3038,2253),
+            typeIdentifier: '[staticLabel]',
+            zoomThreshold: -2,
             name: "PRK Tech",
             title: `<span style="color: #FAFAFB; font-family: 'Jura'; font-size: 14px; font-weight: normal;">PRK Tech</span>`,
         },
         {
             id: "dirwikSuburbsSW",
             position: transCoord(2555,4392),
+            typeIdentifier: '[staticLabel]',
+            zoomThreshold: -2,
             name: "Suburbs",
             title: `<span style="color: #FAFAFB; font-family: 'Jura'; font-size: 14px; font-weight: normal;">Suburbs</span>`,
         },
@@ -2671,18 +2732,24 @@
         {
             id: "fragmentCorridor",
             position: transCoord(4848,2956),
+            typeIdentifier: '[staticLabel]',
+            zoomThreshold: -2,
             name: "Fragment Corridor",
             title: `<span style="color: #FAFAFB; font-family: 'Jura'; font-size: 14px; font-weight: normal;">Fragment Corridor</span>`,
         },
         {
             id: "fragmentHighriseSector",
             position: transCoord(5384,1111),
+            typeIdentifier: '[staticLabel]',
+            zoomThreshold: -2,
             name: "Highrise Sector",
             title: `<span style="color: #FAFAFB; font-family: 'Jura'; font-size: 14px; font-weight: normal;">Highrise Sector</span>`,
         },
         {
             id: "fragmentTimesSquare",
             position: transCoord(5286,2031),
+            typeIdentifier: '[staticLabel]',
+            zoomThreshold: -2,
             name: "Times Square",
             title: `<span style="color: #FAFAFB; font-family: 'Jura'; font-size: 14px; font-weight: normal;">Times Square</span>`,
         },
@@ -2691,6 +2758,8 @@
         {
             id: "stackVoid",
             position: transCoord(3936,1165),
+            typeIdentifier: '[staticLabel]',
+            zoomThreshold: -2,
             name: "Buq0's Void",
             title: `<span style="color: #FAFAFB; font-family: 'Jura'; font-size: 14px; font-weight: normal;">Buq0's Void</span>`,
         },
@@ -2699,24 +2768,32 @@
         {
             id: "skyarcCommercialZone",
             position: transCoord(4734,3699),
+            typeIdentifier: '[staticLabel]',
+            zoomThreshold: -2,
             name: "Commercial Core",
             title: `<span style="color: #FAFAFB; font-family: 'Jura'; font-size: 14px; font-weight: normal;">Commercial Core</span>`,
         },
         {
             id: "skyarcComplex",
             position: transCoord(3802,3796),
+            typeIdentifier: '[staticLabel]',
+            zoomThreshold: -2,
             name: "Skyarc Complex",
             title: `<span style="color: #FAFAFB; font-family: 'Jura'; font-size: 14px; font-weight: normal;">Skyarc Complex</span>`,
         },
         {
             id: "skyarcCrossroads",
             position: transCoord(4268,4283),
+            typeIdentifier: '[staticLabel]',
+            zoomThreshold: -2,
             name: "Crossroads",
             title: `<span style="color: #FAFAFB; font-family: 'Jura'; font-size: 14px; font-weight: normal;">Crossroads</span>`,
         },
         {
             id: "skyarcHighDensityResidential",
             position: transCoord(3616,4185),
+            typeIdentifier: '[staticLabel]',
+            zoomThreshold: -2,
             name: "Residential Cluster",
             title: `<span style="color: #FAFAFB; font-family: 'Jura'; font-size: 14px; font-weight: normal;">Residential<br>Cluster</span>`,
         },
@@ -2725,6 +2802,8 @@
         {
             id: "mirrorCorridor",
             position: transCoord(5761,2876),
+            typeIdentifier: '[staticLabel]',
+            zoomThreshold: -2,
             name: "The Mirror Corridor",
             title: `<span style="color: #FAFAFB; font-family: 'Jura'; font-size: 14px; font-weight: normal;">The Mirror Corridor</span>`,
         },
@@ -3623,8 +3702,7 @@
 
     //document.getElementById("close-btn").addEventListener("click", closeSidebar); duplicate from <head>
 
-    let staticLabelStore = [];
-    staticLabels.forEach(staticLabel => {
+    let staticLabelStore = staticLabels.map(staticLabel => {
 
         var label = L.divIcon({
             className: "static-label",
@@ -3632,9 +3710,16 @@
             iconSize: [10,14],
             iconAnchor: [5,7]
         });
-        //console.log(staticLabel.title+staticLabel.title.length/2)
-        var marker = L.marker(staticLabel.position, {icon: label, interactive:false}).addTo(map).setZIndexOffset(8500);
-        staticLabelStore.push({marker, id: staticLabel.id});
+
+        var marker = L.marker(staticLabel.position, {icon: label, interactive:false});
+
+        return {
+            data: staticLabel,
+            label,
+            marker,
+            visible: false,
+            layerType: 'staticLabels',
+        };
     });
 
     let clickableLabelMainStore = [];
@@ -3718,8 +3803,7 @@
         let zoomLevel = map.getZoom();
         let opacity = 0;
 
-        //opacity= (1/2) * zoomLevel + 1;
-        //if (opacity>1) {opacity=1;}
+      
         if (zoomLevel >= 0) {opacity=1;}
         console.log('syncs: '+zoomLevel+','+opacity);
         syncStore.forEach(({marker}) => {
@@ -3738,8 +3822,7 @@
         let zoomLevel = map.getZoom();
         let opacity = 0;
 
-        //opacity= (5/4) * zoomLevel + (5/2);
-        //if (opacity>1) {opacity=1;}
+    
         if (zoomLevel >= -1.2) {opacity=1;}
         console.log('trials: '+zoomLevel+','+opacity);
         trialStore.forEach(({marker}) => {
@@ -3760,8 +3843,7 @@
         let zoomLevel = map.getZoom();
         let opacity = 0;
 
-        //opacity= (5/4) * zoomLevel + (5/2);
-        //if (opacity>1) {opacity=1;}
+
         if (zoomLevel >= -1.2) {opacity=1;}
         console.log('challenges: '+zoomLevel+','+opacity);
         challengeStore.forEach(({marker,data}) => {
@@ -3783,8 +3865,7 @@
         let zoomLevel = map.getZoom();
         let opacity = 0;
 
-        //opacity= (5/4) * zoomLevel + (5/2);
-        //if (opacity>1) {opacity=1;}
+       
         if (zoomLevel >= -1.2) {opacity=1;}
         console.log('pois: '+zoomLevel+','+opacity);
         poiStore.forEach(({marker}) => {
@@ -3834,7 +3915,7 @@
         let raceSize=goalMarker.length;
         console.log(raceSize);
         if (goalMarker[0]==null||goalMarker==[]) {return;}
-
+       
         if (!goalMarkerDeleting) {
             goalMarkerAux=goalMarker;
             goalMarkerDeleting=true;
@@ -3848,7 +3929,8 @@
                 
                 for (let i = 0; i < goalMarkerAux.length; i++) {
                     map.removeLayer(goalMarkerAux[0]);
-                
+                    /*console.log(i);
+                    console.log(goalMarker);*/
                     goalMarkerAux.shift();
                     console.log("deleted index "+i);
 
@@ -3863,7 +3945,7 @@
     };
 
     function updateSelectedPOI(newPOI,race,newPOIParent){
-        //console.log("newPOI"+newPOI.id+"selPOI"+selectedPOI.id);
+        
         
         if (selectedPOI){                               //if there was a previously selected POI, then
             if (newPOI.marker===selectedPOI.marker) {       //if I clicked the same POI
@@ -3886,7 +3968,7 @@
             selectedPOI=newPOI;
 
             newPOIParent.isSelected = true;
-            //selectedPOIParent.isSelected = false;
+           
             selectedPOIParent=newPOIParent;
         }
     };
@@ -3895,7 +3977,7 @@
         selectedPOI.marker._icon.style.filter = "brightness(1)";
         selectedPOI = null;
         selectedPOIParent.isSelected = false;
-        //if (goalMarker) map.removeLayer(goalMarker);
+      
         renderVisibleMarkers();
     }
 
@@ -3937,12 +4019,12 @@
     });
 
     map.on("zoomend", function () {
- 
+    
         updatePOIOpacity();
     });
 
     
- 
+
     updatePOIOpacity();
 
     map.options.wheelPxPerZoomLevel = 120; // adjust for finer control (default is 60)
@@ -3953,7 +4035,7 @@
 
     superChangelog64();
 
-
+   
 </script>
 
 </body>
