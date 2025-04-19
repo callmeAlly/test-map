@@ -530,21 +530,23 @@
                 let shouldBeVisible = activeLayers[item.layerType] && bounds.contains(item.marker.getLatLng());
 
                 if (shouldBeVisible && !item.visible && (zoomLevel >= item.data.zoomThreshold)) {
+                    item.visible = true;
                     item.marker.addTo(map).setZIndexOffset(9000).setOpacity(0);
                     setTimeout(function() {
                         item.marker.setOpacity(1);
                     }, 20);
                     
                     item.marker._icon.style.pointerEvents = "auto";
-                    item.visible = true;
+
                 }
                 if (((!shouldBeVisible && item.visible) || (item.visible && zoomLevel < item.data.zoomThreshold)) && !item.data.isSelected) {
+                    item.visible = false;
                     item.marker.setOpacity(0);
                     item.marker._icon.style.pointerEvents = "none";
                     setTimeout(function() {
                         map.removeLayer(item.marker);
                     }, 500);
-                    item.visible = false;
+
                 }
             });
         }
