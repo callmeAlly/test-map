@@ -233,7 +233,7 @@
     
 
     // Add the image as a layer
-    L.imageOverlay('MapBase.png', bounds).addTo(map);
+    L.imageOverlay('MapBasse.png', bounds).addTo(map);
 
     // Fit the map to the image size
     map.fitBounds(bounds);
@@ -506,6 +506,10 @@
 
 
 
+
+
+
+
     let activeLayers = {
         trials: true,
         syncs: true,
@@ -519,38 +523,56 @@
         renderVisibleMarkers();
     };
 
+    let renderTimeout = null;
+    function debouncedRenderVisibleMarkers(delay) {
+        console.log("debouncing");
+        if (renderTimeout) {
+            clearTimeout(renderTimeout);
+        }
+
+        renderTimeout = setTimeout(() => {
+            renderVisibleMarkers();
+            renderTimeout=null;
+            console.log("debounced");
+        }, delay);
+    }
 
     function renderVisibleMarkers() {
         let bounds = map.getBounds();
         let zoomLevel = map.getZoom();
         
-
+        // for clickable POIs
         for (let store of [trialStore, challengeStore, syncStore, staticLabelStore]) {
             store.forEach(item => {
                 let shouldBeVisible = activeLayers[item.layerType] && bounds.contains(item.marker.getLatLng());
 
                 if (shouldBeVisible && !item.visible && (zoomLevel >= item.data.zoomThreshold)) {
-                    item.visible = true;
                     item.marker.addTo(map).setZIndexOffset(9000).setOpacity(0);
+                    item.visible = true;
+
                     setTimeout(function() {
                         item.marker.setOpacity(1);
                     }, 20);
                     
                     item.marker._icon.style.pointerEvents = "auto";
-
+                    
+                    
                 }
                 if (((!shouldBeVisible && item.visible) || (item.visible && zoomLevel < item.data.zoomThreshold)) && !item.data.isSelected) {
-                    item.visible = false;
                     item.marker.setOpacity(0);
                     item.marker._icon.style.pointerEvents = "none";
+
                     setTimeout(function() {
                         map.removeLayer(item.marker);
+                        item.visible = false;
                     }, 500);
-
+                    
+                    
                 }
             });
         }
 
+        // for unclickable POIs
         /*for (let store of [staticLabelStore]) {
             store.forEach(item => {
                 let shouldBeVisible = activeLayers[item.layerType] && bounds.contains(item.marker.getLatLng());
@@ -3425,6 +3447,7 @@
 
         // hide tooltips
         marker.on("mouseout", function() {
+            console.log("mouseout event: trial "+trial.id);
             isWaitingUnrender=true;
             if (!trial.isSelected) {  
 
@@ -3805,7 +3828,8 @@
         let zoomLevel = map.getZoom();
         let opacity = 0;
 
-      
+        //opacity= (1/2) * zoomLevel + 1;
+        //if (opacity>1) {opacity=1;}
         if (zoomLevel >= 0) {opacity=1;}
         console.log('syncs: '+zoomLevel+','+opacity);
         syncStore.forEach(({marker}) => {
@@ -3824,7 +3848,8 @@
         let zoomLevel = map.getZoom();
         let opacity = 0;
 
-    
+        //opacity= (5/4) * zoomLevel + (5/2);
+        //if (opacity>1) {opacity=1;}
         if (zoomLevel >= -1.2) {opacity=1;}
         console.log('trials: '+zoomLevel+','+opacity);
         trialStore.forEach(({marker}) => {
@@ -3845,7 +3870,8 @@
         let zoomLevel = map.getZoom();
         let opacity = 0;
 
-
+        //opacity= (5/4) * zoomLevel + (5/2);
+        //if (opacity>1) {opacity=1;}
         if (zoomLevel >= -1.2) {opacity=1;}
         console.log('challenges: '+zoomLevel+','+opacity);
         challengeStore.forEach(({marker,data}) => {
@@ -3867,7 +3893,8 @@
         let zoomLevel = map.getZoom();
         let opacity = 0;
 
-       
+        //opacity= (5/4) * zoomLevel + (5/2);
+        //if (opacity>1) {opacity=1;}
         if (zoomLevel >= -1.2) {opacity=1;}
         console.log('pois: '+zoomLevel+','+opacity);
         poiStore.forEach(({marker}) => {
@@ -3917,7 +3944,21 @@
         let raceSize=goalMarker.length;
         console.log(raceSize);
         if (goalMarker[0]==null||goalMarker==[]) {return;}
-       
+        //console.log(goalMarker);
+        /*if (!race) {return;}
+        if (raceSize==1) {raceType="trial";}
+        if (raceSize>=2) {raceType="challenge";}
+
+        if (raceType=="trial") {
+            //console.log(goalMarker[0].getLatLng());
+            map.removeLayer(goalMarker[0]);
+        }
+
+        if (raceType="challenge") {
+            for (let i = 0; i < raceSize; i++) {
+                map.removeLayer(goalMarker[i]);
+            }
+        }*/
         if (!goalMarkerDeleting) {
             goalMarkerAux=goalMarker;
             goalMarkerDeleting=true;
@@ -3947,7 +3988,7 @@
     };
 
     function updateSelectedPOI(newPOI,race,newPOIParent){
-        
+        //console.log("newPOI"+newPOI.id+"selPOI"+selectedPOI.id);
         
         if (selectedPOI){                               //if there was a previously selected POI, then
             if (newPOI.marker===selectedPOI.marker) {       //if I clicked the same POI
@@ -3970,7 +4011,7 @@
             selectedPOI=newPOI;
 
             newPOIParent.isSelected = true;
-           
+            //selectedPOIParent.isSelected = false;
             selectedPOIParent=newPOIParent;
         }
     };
@@ -3979,7 +4020,7 @@
         selectedPOI.marker._icon.style.filter = "brightness(1)";
         selectedPOI = null;
         selectedPOIParent.isSelected = false;
-      
+        //if (goalMarker) map.removeLayer(goalMarker);
         renderVisibleMarkers();
     }
 
@@ -4021,23 +4062,53 @@
     });
 
     map.on("zoomend", function () {
-    
+        //updateSyncOpacity();
+        //updateTrialOpacity();
+        //updateChallengeOpacity();
         updatePOIOpacity();
     });
 
     
-
+    //updateSyncOpacity();
+    //updateTrialOpacity();
+    //updateChallengeOpacity();
     updatePOIOpacity();
+    renderVisibleMarkers();
 
     map.options.wheelPxPerZoomLevel = 120; // adjust for finer control (default is 60)
 
-    map.on('moveend zoomend', renderVisibleMarkers);
- 
+    /*map.on('move zoom zoomend', () => {
+        debouncedRenderVisibleMarkers(100);
+    });
+
+    map.on('zoomstart', () => {
+        debouncedRenderVisibleMarkers(400);
+    });*/
+    map.on('move', () => {
+        debouncedRenderVisibleMarkers(50);
+        console.log("called debounce - move");
+
+    });
+    map.on('zoom', () => {
+        debouncedRenderVisibleMarkers(100);
+        console.log("called debounce - zoom");
+        
+    });
+    map.on('zoomstart', () => {
+        debouncedRenderVisibleMarkers(400);
+        console.log("called debounce - zoomstart");
+        
+    });
+    map.on('zoomend', () => {
+        debouncedRenderVisibleMarkers(200);
+        console.log("called debounce - zoomend");
+        
+    });
 
 
     superChangelog64();
 
-   
+  
 </script>
 
 </body>
