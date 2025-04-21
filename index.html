@@ -554,7 +554,10 @@
                         item.marker.setOpacity(1);
                     }, 20);
                     
-                    item.marker._icon.style.pointerEvents = "auto";
+                    if (item.layerType != 'staticLabels') {
+                        item.marker._icon.style.pointerEvents = "auto";
+                    }
+                    
                     
                     
                 }
@@ -562,7 +565,9 @@
                     
                     item.pendingRemoval = false;
                     item.marker.setOpacity(1);
-                    item.marker._icon.style.pointerEvents = "auto";
+                    if (item.layerType != 'staticLabels') {
+                        item.marker._icon.style.pointerEvents = "auto";
+                    }
                 }
 
                 if (((!shouldBeVisible && item.visible) || (item.visible && zoomLevel < item.data.zoomThreshold)) && !item.data.isSelected) {
@@ -583,29 +588,7 @@
             });
         }
 
-        // for unclickable POIs
-        /*for (let store of [staticLabelStore]) {
-            store.forEach(item => {
-                let shouldBeVisible = activeLayers[item.layerType] && bounds.contains(item.marker.getLatLng());
 
-                if (shouldBeVisible && !item.visible && (zoomLevel >= item.data.zoomThreshold)) {
-                    item.marker.addTo(map).setZIndexOffset(9000).setOpacity(0);
-                    setTimeout(function() {
-                        item.marker.setOpacity(1);
-                    }, 20);
-                    
-                    item.visible = true;
-                }
-                if ((!shouldBeVisible && item.visible) || (item.visible && zoomLevel < item.data.zoomThreshold)) {
-                    item.marker.setOpacity(0);
-                    
-                    setTimeout(function() {
-                        map.removeLayer(item.marker);
-                    }, 500);
-                    item.visible = false;
-                }
-            });
-        }*/
     };
 
         
