@@ -354,65 +354,74 @@
         noClip: true,
         color: "white",       // Outline color
         fillColor: "orange", // Fill color
-        fillOpacity: 0.2     // Transparency
+        fillOpacity: 0.2,     // Transparency
+        interactive: false,
     }).addTo(map);
-    fragment.bindPopup("Fragment");
+
 
     var skyarc = L.polygon(skyarcOriginalCoords.map(([x, y]) => [flipY(y), x ]), {
         noClip: true,
         color: "white",       // Outline color
         fillColor: "green", // Fill color
-        fillOpacity: 0.2     // Transparency
+        fillOpacity: 0.2,     // Transparency
+        interactive: false,
     }).addTo(map);
-    skyarc.bindPopup("Skyarc");
+
 
     var downtown = L.polygon(downtownOriginalCoords.map(([x, y]) => [flipY(y), x ]), {
         noClip: true,
         color: "white",       // Outline color
         fillColor: "#AFA5FF", // Fill color
-        fillOpacity: 0.2     // Transparency
+        fillOpacity: 0.2,     // Transparency
+        interactive: false,
     }).addTo(map);
-    downtown.bindPopup("Downtown");
+
 
     var citra = L.polygon(citraOriginalCoords.map(([x, y]) => [flipY(y), x ]), {
         noClip: true,
         color: "white",       // Outline color
         fillColor: "gold", // Fill color
-        fillOpacity: 0.2     // Transparency
+        fillOpacity: 0.2,     // Transparency
+        interactive: false,
     }).addTo(map);
-    citra.bindPopup("Citra");
+
 
     var mirror = L.polygon(mirrorOriginalCoords.map(([x, y]) => [flipY(y), x ]), {
         noClip: true,
         color: "white",       // Outline color
         fillColor: "cyan", // Fill color
-        fillOpacity: 0.2     // Transparency
+        fillOpacity: 0.2,     // Transparency
+        interactive: false,
     }).addTo(map);
-    mirror.bindPopup("The Mirror");
+
 
     var axiom = L.polygon(axiomOriginalCoords.map(([x, y]) => [flipY(y), x ]), {
         noClip: true,
         color: "white",       // Outline color
         fillColor: "pink", // Fill color
-        fillOpacity: 0.2     // Transparency
+        fillOpacity: 0.2,     // Transparency
+        interactive: false,
     }).addTo(map);
-    axiom.bindPopup("Axiom");
+
 
     var stack = L.polygon(stackOriginalCoords.map(([x, y]) => [flipY(y), x ]), {
         noClip: true,
         color: "white",       // Outline color
         fillColor: "purple", // Fill color
-        fillOpacity: 0.2     // Transparency
+        fillOpacity: 0.2,     // Transparency
+        interactive: false,
     }).addTo(map);
-    stack.bindPopup("Stack");
+
 
     var dirwik = L.polygon(dirwikOriginalCoords.map(([x, y]) => [flipY(y), x ]), {
         noClip: true,
         color: "white",       // Outline color
         fillColor: "blue", // Fill color
-        fillOpacity: 0.2     // Transparency
+        fillOpacity: 0.2,     // Transparency
+        interactive: false,
     }).addTo(map);
-    dirwik.bindPopup("Dirwik");
+
+
 
 
     
@@ -597,13 +606,29 @@
             });
         }
 
-      
+       
     };
 
         
 
 
-  
+    /* POI Data (similar to labels, but using icons)
+    var poiData = [
+        {
+            id: "cloverDrift",
+            x: 3277, // X Position
+            y: 3137, // Y Position
+            icon: "images/icons/sync.png", // Icon Image
+            sidebarKey: "cloverDrift" // Links to sidebar content
+        },
+        {
+            id: "remnant",
+            x: 4445,
+            y: 2349,
+            icon: "images/icons/sync.png",
+            sidebarKey: "remnant"
+        }
+    ];*/
 
     var syncs = [
         //syncs
@@ -3956,21 +3981,7 @@
         let raceSize=goalMarker.length;
         console.log(raceSize);
         if (goalMarker[0]==null||goalMarker==[]) {return;}
-        //console.log(goalMarker);
-        /*if (!race) {return;}
-        if (raceSize==1) {raceType="trial";}
-        if (raceSize>=2) {raceType="challenge";}
-
-        if (raceType=="trial") {
-            //console.log(goalMarker[0].getLatLng());
-            map.removeLayer(goalMarker[0]);
-        }
-
-        if (raceType="challenge") {
-            for (let i = 0; i < raceSize; i++) {
-                map.removeLayer(goalMarker[i]);
-            }
-        }*/
+     
         if (!goalMarkerDeleting) {
             goalMarkerAux=goalMarker;
             goalMarkerDeleting=true;
@@ -4089,18 +4100,7 @@
 
     map.options.wheelPxPerZoomLevel = 120; // adjust for finer control (default is 60)
 
-    /*map.on('move zoom zoomend', () => {
-        debouncedRenderVisibleMarkers(100);
-    });
-
-    map.on('zoomstart', () => {
-        debouncedRenderVisibleMarkers(400);
-    });
-    map.on('move', () => {
-        debouncedRenderVisibleMarkers(50);
-        console.log("called debounce - move");
-
-    });*/
+ 
     
 
     if (!isMobile) {
@@ -4124,7 +4124,7 @@
 
     superChangelog64();
 
-
+  
 </script>
 
 </body>
