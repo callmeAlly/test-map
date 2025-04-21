@@ -4087,16 +4087,18 @@
         console.log("called debounce - move");
 
     });*/
-    map.on('zoom', () => {
-        debouncedRenderVisibleMarkers(100);
-        console.log("called debounce - zoom");
-        
-    });
-    map.on('zoomstart', () => {
-        debouncedRenderVisibleMarkers(400);
-        console.log("called debounce - zoomstart");
-        
-    });
+    if (!isMobile) {
+        map.on('zoom', () => {
+            debouncedRenderVisibleMarkers(100);
+            console.log("called debounce - zoom");
+            
+        });
+        map.on('zoomstart', () => {
+            debouncedRenderVisibleMarkers(400);
+            console.log("called debounce - zoomstart");
+            
+        });
+    }
     map.on('zoomend moveend', () => {
         debouncedRenderVisibleMarkers(200);
         console.log("called debounce - zoomend");
