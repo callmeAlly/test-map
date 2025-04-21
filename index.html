@@ -558,7 +558,7 @@
         let zoomLevel = map.getZoom();
         
         // for clickable POIs
-        for (let store of []) {
+        for (let store of [trialStore, challengeStore, syncStore, staticLabelStore,clickableLabelStore]) {
             store.forEach(item => {
                 let shouldBeVisible = activeLayers[item.layerType] && bounds.contains(item.marker.getLatLng());
 
