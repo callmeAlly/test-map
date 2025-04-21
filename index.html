@@ -204,7 +204,8 @@
 
     // Initialize the map
     var map = null;
-
+    L.Browser.retina = false;
+	
     if (isMobile) {
         map = L.map('map', {
             crs: L.CRS.Simple, // Use simple coordinate system
@@ -231,6 +232,9 @@
             maxBounds: bounds, // Restricts panning to the image
             maxBoundsViscosity: 1.0 // Fully locks panning within bounds
             ,renderer: L.svg({padding: 1}) // fixes polygon clipping
+	    ,zoomAnimation: false,
+            fadeAnimation: false,
+            markerZoomAnimation: false
         });
     }
     
