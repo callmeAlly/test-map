@@ -4098,12 +4098,12 @@
 
     map.on('zoomstart', () => {
         debouncedRenderVisibleMarkers(400);
-    });*/
+    });
     map.on('move', () => {
         debouncedRenderVisibleMarkers(50);
         console.log("called debounce - move");
 
-    });
+    });*/
     map.on('zoom', () => {
         debouncedRenderVisibleMarkers(100);
         console.log("called debounce - zoom");
@@ -4122,6 +4122,7 @@
 
 
     superChangelog64();
+
 
 </script>
 
