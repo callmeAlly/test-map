@@ -542,21 +542,26 @@
         let zoomLevel = map.getZoom();
         
         // for clickable POIs
-        for (let store of [trialStore, challengeStore, syncStore, staticLabelStore]) {
+        for (let store of [trialStore, challengeStore, syncStore, staticLabelStore,clickableLabelStore]) {
             store.forEach(item => {
                 let shouldBeVisible = activeLayers[item.layerType] && bounds.contains(item.marker.getLatLng());
 
                 if (shouldBeVisible && !item.visible && (zoomLevel >= item.data.zoomThreshold)) {
                     item.marker.addTo(map).setZIndexOffset(9000).setOpacity(0);
+                    if (item.marker2) {item.marker2.addTo(map).setZIndexOffset(10000).setOpacity(0);}
+
                     item.visible = true;
 
                     setTimeout(function() {
                         item.marker.setOpacity(1);
+                        if (item.marker2) {item.marker2.setOpacity(1);}
                     }, 20);
                     
                     if (item.layerType != 'staticLabels') {
                         item.marker._icon.style.pointerEvents = "auto";
                     }
+
+                    
                     
                     
                     
@@ -565,6 +570,8 @@
                     
                     item.pendingRemoval = false;
                     item.marker.setOpacity(1);
+                    if (item.marker2) {item.marker2.setOpacity(1);}
+
                     if (item.layerType != 'staticLabels') {
                         item.marker._icon.style.pointerEvents = "auto";
                     }
@@ -572,12 +579,14 @@
 
                 if (((!shouldBeVisible && item.visible) || (item.visible && zoomLevel < item.data.zoomThreshold)) && !item.data.isSelected) {
                     item.marker.setOpacity(0);
+                    if (item.marker2) {item.marker2.setOpacity(0);}
                     item.marker._icon.style.pointerEvents = "none";
                     item.pendingRemoval = true;
 
                     setTimeout(function() {
                         if (item.pendingRemoval) {
                             map.removeLayer(item.marker);
+                            if (item.marker2) {map.removeLayer(item.marker2);}
                             item.visible = false;
                             item.pendingRemoval = false;
                         }
@@ -588,29 +597,13 @@
             });
         }
 
-
+      
     };
 
         
 
 
-    /* POI Data (similar to labels, but using icons)
-    var poiData = [
-        {
-            id: "cloverDrift",
-            x: 3277, // X Position
-            y: 3137, // Y Position
-            icon: "images/icons/sync.png", // Icon Image
-            sidebarKey: "cloverDrift" // Links to sidebar content
-        },
-        {
-            id: "remnant",
-            x: 4445,
-            y: 2349,
-            icon: "images/icons/sync.png",
-            sidebarKey: "remnant"
-        }
-    ];*/
+  
 
     var syncs = [
         //syncs
@@ -807,7 +800,7 @@
             title: `<span style="color: white; font-family: 'Jura'; font-size: 24px; font-weight: normal;">FRS-DTE</span>`,
             content: `
                 <img src="images/icons/lol.png" alt="FRS-DTE" style="width: 100%; border-radius: 8px; margin-bottom: 10px;">
-                <p><span style="color: white; font-family: 'Source Sans 3'; font-weight: 300;">:clueless:</span></p>
+                <p><span style="color: white; font-family: 'Source Sans 3'; font-weight: 300;">She said <i>no</i>.</span></p>
             `
         },
         {
@@ -2831,6 +2824,7 @@
         {
             id: "downtownLogo",
             position: transCoord(4000,2235),
+            zoomThreshold: -2,
             contentKey: "downtown",
             name: "Downtown",
             title: `<span style="
@@ -2868,6 +2862,7 @@
         {
             id: "dirwikLogo",
             position: transCoord(2860,2785),
+            zoomThreshold: -2,
             contentKey: "dirwik",
             name: "Dirwik",
             title: `<span style="
@@ -2902,6 +2897,7 @@
         {
             id: "fragmentLogo",
             position: transCoord(5120,2140),
+            zoomThreshold: -2,
             contentKey: "fragment",
             name: "Fragment",
             title: `<span style="
@@ -2936,6 +2932,7 @@
         {
             id: "stackLogo",
             position: transCoord(3920,1010),
+            zoomThreshold: -2,
             contentKey: "stack",
             name: "Stack",
             title: `<span style="
@@ -2970,6 +2967,7 @@
         {
             id: "skyarcLogo",
             position: transCoord(4165,3940),
+            zoomThreshold: -2,
             contentKey: "skyarc",
             name: "Skyarc",
             title: `<span style="
@@ -3005,6 +3003,7 @@
         {
             id: "mirrorLogo",
             position: transCoord(6300,2750),
+            zoomThreshold: -2,
             contentKey: "mirror",
             name: "The Mirror",
             title: `<span style="
@@ -3040,6 +3039,7 @@
         {
             id: "citraLogo",
             position: transCoord(6080,3935),
+            zoomThreshold: -2,
             contentKey: "citra",
             name: "Citra",
             title: `<span style="
@@ -3074,6 +3074,7 @@
         {
             id: "axiomLogo",
             position: transCoord(6290,1600),
+            zoomThreshold: -2,
             contentKey: "axiom",
             name: "Axiom",
             title: `<span style="
@@ -3108,6 +3109,7 @@
         {
             id: "vertexLogo",
             position: transCoord(4210,3460),
+            zoomThreshold: -2,
             contentKey: "vertex",
             name: "Vertex",
             title: `<span style="
@@ -3745,8 +3747,12 @@
         };
     });
 
-    let clickableLabelMainStore = [];
-    clickableLabelsMain.forEach(clickableLabel => {
+
+
+
+
+
+    let clickableLabelStore = clickableLabelsMain.map(clickableLabel => {
 
         var label = L.divIcon({
             className: "clickable-label-main",
@@ -3755,10 +3761,6 @@
             iconAnchor: [5,7]
         });
 
-        var marker = L.marker(clickableLabel.position, {icon: label, interactive:true}).addTo(map).setZIndexOffset(8800);
-        clickableLabelMainStore.push({marker, id: clickableLabel.id});
-        marker.on("click", function () {openSidebar(clickableLabel.contentKey); if(selectedPOI){deselectPOI(); goalDelete();}});
-
         var label2 = L.divIcon({
             className: "clickable-label-main",
             html: clickableLabel.title2,
@@ -3766,9 +3768,21 @@
             iconAnchor: [5,7]
         });
 
-        var marker = L.marker(clickableLabel.position, {icon: label2, interactive:false}).addTo(map).setZIndexOffset(8900);
+        var marker = L.marker(clickableLabel.position, {icon: label, interactive:true});
+        var marker2 = L.marker(clickableLabel.position, {icon: label2, interactive:false});
 
+        marker.on("click", function () {openSidebar(clickableLabel.contentKey); if(selectedPOI){deselectPOI(); goalDelete();}});
 
+        return {
+            data: clickableLabel,
+            label,
+            label2,
+            marker,
+            marker2,
+            visible: false,
+            pendingRemoval: false,
+            layerType: 'clickableLabels',
+        };
     });
 
     // Function to open the sidebar with specific content
@@ -4087,6 +4101,8 @@
         console.log("called debounce - move");
 
     });*/
+    
+
     if (!isMobile) {
         map.on('zoom', () => {
             debouncedRenderVisibleMarkers(100);
