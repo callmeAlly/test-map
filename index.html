@@ -109,6 +109,10 @@
             paint-order: stroke fill;
         }
 
+	.leaflet-image-layer {
+	  will-change: transform;
+	  transform: translateZ(0);
+	}
         /*.poi-tooltip:hover,
         .poi-tooltip-second:hover {
             opacity: 0.2 !important; /* Make the tooltip transparent 
@@ -232,7 +236,8 @@
             attributionControl: false, // Disable the white bar caused by attribution
             maxBounds: bounds, // Restricts panning to the image
             maxBoundsViscosity: 1.0 // Fully locks panning within bounds
-            ,renderer: L.svg({padding: 1}) // fixes polygon clipping
+            ,renderer: L.canvas(),
+	    preferCanvas: true,
 	    ,zoomAnimation: false,
             fadeAnimation: false,
             markerZoomAnimation: false
