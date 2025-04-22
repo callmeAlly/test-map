@@ -246,7 +246,7 @@
     
 
     // Add the image as a layer
-    L.imageOverlay('MapBase.webp', bounds).addTo(map);
+    L.imageOverlay('MapBase.png', bounds).addTo(map);
 
     // Fit the map to the image size
     map.fitBounds(bounds);
@@ -569,15 +569,15 @@
                 let shouldBeVisible = activeLayers[item.layerType] && bounds.contains(item.marker.getLatLng());
 
                 if (shouldBeVisible && !item.visible && (zoomLevel >= item.data.zoomThreshold)) {
-                    item.marker.addTo(map).setZIndexOffset(9000).setOpacity(0);
-                    if (item.marker2) {item.marker2.addTo(map).setZIndexOffset(10000).setOpacity(0);}
+                    item.marker.addTo(map).setZIndexOffset(9000).setOpacity(1);
+                    if (item.marker2) {item.marker2.addTo(map).setZIndexOffset(10000).setOpacity(1);}
 
                     item.visible = true;
 
-                    setTimeout(function() {
+                    /*setTimeout(function() {
                         item.marker.setOpacity(1);
                         if (item.marker2) {item.marker2.setOpacity(1);}
-                    }, 20);
+                    }, 20);*/
                     
                     if (item.layerType != 'staticLabels') {
                         item.marker._icon.style.pointerEvents = "auto";
@@ -605,14 +605,14 @@
                     item.marker._icon.style.pointerEvents = "none";
                     item.pendingRemoval = true;
 
-                    setTimeout(function() {
+                    
                         if (item.pendingRemoval) {
                             map.removeLayer(item.marker);
                             if (item.marker2) {map.removeLayer(item.marker2);}
                             item.visible = false;
                             item.pendingRemoval = false;
                         }
-                    }, 500);
+                    
                     
                     
                 }
