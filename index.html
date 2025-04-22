@@ -112,6 +112,7 @@
 	.leaflet-image-layer {
 	  will-change: transform;
 	  transform: translateZ(0);
+	  image-rendering: pixelated;
 	}
         /*.poi-tooltip:hover,
         .poi-tooltip-second:hover {
@@ -220,7 +221,7 @@
             attributionControl: false, // Disable the white bar caused by attribution
             maxBounds: bounds, // Restricts panning to the image
             maxBoundsViscosity: 1.0 // Fully locks panning within bounds
-            ,renderer: L.canvas(),
+            ,renderer: L.canvas({padding: 5}),
 	    preferCanvas: true,
             zoomAnimation: false,
             fadeAnimation: false,
@@ -246,7 +247,7 @@
     
 
     // Add the image as a layer
-    L.imageOverlay('MapBase.webp', bounds).addTo(map);
+    L.imageOverlay('MapBase.png', bounds).addTo(map);
 
     // Fit the map to the image size
     map.fitBounds(bounds);
