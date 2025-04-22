@@ -216,7 +216,8 @@
             attributionControl: false, // Disable the white bar caused by attribution
             maxBounds: bounds, // Restricts panning to the image
             maxBoundsViscosity: 1.0 // Fully locks panning within bounds
-            ,renderer: L.svg({padding: 10}),
+            ,renderer: L.canvas(),
+	    preferCanvas: true,
             zoomAnimation: false,
             fadeAnimation: false,
             markerZoomAnimation: false
