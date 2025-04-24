@@ -221,7 +221,7 @@
             attributionControl: false, // Disable the white bar caused by attribution
             maxBounds: bounds, // Restricts panning to the image
             maxBoundsViscosity: 1.0 // Fully locks panning within bounds
-            ,renderer: L.canvas({padding: 3}),
+            ,renderer: L.canvas({padding: 2}),
             preferCanvas: true,
             zoomAnimation: false,
             fadeAnimation: false,
@@ -249,6 +249,38 @@
     map.setView(transCoord(4000,2235),-2);
 
     const customTileLayer = L.TileLayer.extend({
+        _tileQueue: [],
+        _tileDelay: 70, // Adjust delay in ms between tile loads
+        _tileProcessing: false,
+        _tileAbortControllers: new Set(),
+
+        initialize: function (url, options) {
+            L.TileLayer.prototype.initialize.call(this, url, options);
+            this._onZoomStart = this._handleZoomStart.bind(this);
+        },
+
+        onAdd: function (map) {
+            L.TileLayer.prototype.onAdd.call(this, map);
+            map.on('zoomstart', this._onZoomStart);
+        },
+
+        onRemove: function (map) {
+            map.off('zoomstart', this._onZoomStart);
+            this._clearQueueAndAbort();
+            L.TileLayer.prototype.onRemove.call(this, map);
+        },
+
+        _handleZoomStart: function () {
+            this._clearQueueAndAbort();
+        },
+
+        _clearQueueAndAbort: function () {
+            this._tileQueue = [];
+            this._tileProcessing = false;
+            this._tileAbortControllers.forEach(ctrl => ctrl.abort());
+            this._tileAbortControllers.clear();
+        },
+
         getTileUrl: function (coords) {
             const flippedY = (coords.y*-1)-1;
 
@@ -256,29 +288,80 @@
             const url = `tiles/${coords.z}/${coords.x}/${flippedY}.png`;
             console.log(`Requesting tile at Z${coords.z}/${coords.x}/${flippedY} → ${url}`);
             return url;
+        },
+
+        createTile: function (coords, done) {
+            const tile = document.createElement('img');
+            const controller = new AbortController();
+            this._tileAbortControllers.add(controller);
+
+            this._tileQueue.push(() => {
+                if (controller.signal.aborted) {
+                    done(null, tile); // Tile won't be used
+                    return;
+                }
+
+                tile.onload = () => {
+                    this._tileAbortControllers.delete(controller);
+                    done(null, tile);
+                };
+
+                tile.onerror = () => {
+                    this._tileAbortControllers.delete(controller);
+                    done(new Error('Tile load error'), tile);
+                };
+
+                tile.src = this.getTileUrl(coords);
+            });
+
+            if (!this._tileProcessing) {
+                this._processQueue();
+            }
+
+            return tile;
+        },
+
+        _processQueue: function () {
+            if (this._tileQueue.length === 0) {
+                this._tileProcessing = false;
+                return;
+            }
+
+            this._tileProcessing = true;
+            const next = this._tileQueue.shift();
+            next();
+
+            setTimeout(() => this._processQueue(), this._tileDelay);
         }
+
+
     });
 
     // Add the image as a layer
     //L.imageOverlay('MapBasse.png', bounds).addTo(map);
-    const tileLayer = new customTileLayer('', {
-        tileSize: 256,
-        noWrap: true,
-        minZoom: -2,
-        maxZoom: 1.2,
-        bounds: [[0, 0], [5400, 9600]],
-        zoomDelta: 0.3,
-        zoomSnap: 0.3,
-        continuousWorld: false,
-        updateWhenIdle: true,
-        keepBuffer:1,
-        updateWhenZooming: false,
-        reuseTiles: true,
-        tms:false,
+    let tileLayer = null;
+    if (isMobile) {
+        tileLayer = new customTileLayer('', {
+            tileSize: 256,
+            noWrap: true,
+            minZoom: -2,
+            maxZoom: 1.3,
+            bounds: [[0, 0], [5400, 9600]],
+            zoomDelta: 1,
+            zoomSnap: 1,
+            continuousWorld: false,
+            //updateWhenIdle: true,
+            keepBuffer:0,
+            //updateWhenZooming: false,
+            reuseTiles: true,
+            //updateInterval: 700
 
-        // Custom tile URL function to remap Leaflet zoom to tile zoom
-        
-    }).addTo(map);
+            // Custom tile URL function to remap Leaflet zoom to tile zoom
+            
+        }).addTo(map);
+    } else {
+        L.imageOverlay('MapBase.png', bounds).addTo(map);
+    }
     
     
     
