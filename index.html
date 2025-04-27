@@ -7,6 +7,8 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <link rel="stylesheet" href="https://unpkg.com/leaflet/dist/leaflet.css" />
     <script src="https://unpkg.com/leaflet/dist/leaflet.js"></script>
+    <script src="https://unpkg.com/pixi.js@8.9.1/dist/pixi.min.js"></script>
+    <script src="https://unpkg.com/leaflet-pixi-overlay@1.9.4/L.PixiOverlay.min.js"></script>
     <style>
         html, body {
             height: 100%;
@@ -365,6 +367,7 @@
     
     
     
+    
 
     var fragmentOriginalCoords = [
         [4030,0],
@@ -561,6 +564,27 @@
             popupAnchor: [0, -32] // Position relative to marker
         }),
 
+        "router": L.icon({
+            iconUrl: 'images/icons/router.png',
+            iconSize: [20, 20],  // Size of the icon
+            iconAnchor: [10, 10], // Anchor point (center)
+            popupAnchor: [0, -32] // Position relative to marker
+        }),
+
+        "transceiver": L.icon({
+            iconUrl: 'images/icons/transceiver.png',
+            iconSize: [30, 30],  // Size of the icon
+            iconAnchor: [15, 15], // Anchor point (center)
+            popupAnchor: [0, -32] // Position relative to marker
+        }),
+
+        "resource": L.icon({
+            iconUrl: 'images/icons/resource.png',
+            iconSize: [26, 26],  // Size of the icon
+            iconAnchor: [13, 13], // Anchor point (center)
+            popupAnchor: [0, -32] // Position relative to marker
+        }),
+
         "checkpoint": L.icon({
             iconUrl: 'images/icons/checkpoints.png',
             iconSize: [20, 20],  // Size of the icon
@@ -644,14 +668,21 @@
 
 
 
-
+    let isFilterActive = false;
 
     let activeLayers = {
         trials: true,
         syncs: true,
         challenges: true,
         staticLabels: true,
-        clickableLabels: true
+        clickableLabels: true,
+        routers: true,
+        transceivers: true,
+        resources: true,
+        npcs: true,
+        pois: true
+
+
     };
 
     function toggleLayer(layer) {
@@ -678,11 +709,15 @@
         let zoomLevel = map.getZoom();
         
         // for clickable POIs
-        for (let store of [trialStore, challengeStore, syncStore, staticLabelStore,clickableLabelStore]) {
+        for (let store of [trialStore, challengeStore, syncStore, staticLabelStore, clickableLabelStore, routerStore, transceiverStore, resourceStore]) {
             store.forEach(item => {
                 let shouldBeVisible = activeLayers[item.layerType] && bounds.contains(item.marker.getLatLng());
+                let meetsZoomRequirement = null;
+                if (item.layerType != 'clickableLabels') {meetsZoomRequirement = zoomLevel >= item.data.zoomThreshold;}
+                if (item.layerType == 'clickableLabels') {meetsZoomRequirement = (zoomLevel >= item.data.zoomThreshold) && (zoomLevel <= -0.6);}
 
-                if (shouldBeVisible && !item.visible && (zoomLevel >= item.data.zoomThreshold)) {
+
+                if (shouldBeVisible && !item.visible && (meetsZoomRequirement)) {
                     item.marker.addTo(map).setZIndexOffset(9000).setOpacity(0);
                     if (item.marker2) {item.marker2.addTo(map).setZIndexOffset(10000).setOpacity(0);}
 
@@ -696,13 +731,10 @@
                     if (item.layerType != 'staticLabels') {
                         item.marker._icon.style.pointerEvents = "auto";
                     }
-
-                    
-                    
-                    
-                    
                 }
-                if (shouldBeVisible && (item.visible&&item.pendingRemoval) && (zoomLevel >= item.data.zoomThreshold)) {
+
+
+                if (shouldBeVisible && (item.visible&&item.pendingRemoval) && (meetsZoomRequirement)) {
                     
                     item.pendingRemoval = false;
                     item.marker.setOpacity(1);
@@ -713,7 +745,8 @@
                     }
                 }
 
-                if (((!shouldBeVisible && item.visible) || (item.visible && zoomLevel < item.data.zoomThreshold)) && !item.data.isSelected) {
+
+                if (((!shouldBeVisible && item.visible) || (item.visible && !meetsZoomRequirement)) && !item.data.isSelected) {
                     item.marker.setOpacity(0);
                     if (item.marker2) {item.marker2.setOpacity(0);}
                     item.marker._icon.style.pointerEvents = "none";
@@ -727,35 +760,13 @@
                             item.pendingRemoval = false;
                         }
                     }, 500);
-                    
-                    
                 }
+
             });
+
         }
+        
 
-        // for unclickable POIs
-        /*for (let store of [staticLabelStore]) {
-            store.forEach(item => {
-                let shouldBeVisible = activeLayers[item.layerType] && bounds.contains(item.marker.getLatLng());
-
-                if (shouldBeVisible && !item.visible && (zoomLevel >= item.data.zoomThreshold)) {
-                    item.marker.addTo(map).setZIndexOffset(9000).setOpacity(0);
-                    setTimeout(function() {
-                        item.marker.setOpacity(1);
-                    }, 20);
-                    
-                    item.visible = true;
-                }
-                if ((!shouldBeVisible && item.visible) || (item.visible && zoomLevel < item.data.zoomThreshold)) {
-                    item.marker.setOpacity(0);
-                    
-                    setTimeout(function() {
-                        map.removeLayer(item.marker);
-                    }, 500);
-                    item.visible = false;
-                }
-            });
-        }*/
     };
 
         
@@ -1490,7 +1501,7 @@
         },
         {
             id: "artemisInterior",
-            position: transCoord(2794,3477),
+            position: transCoord(2800,3499),
             icon: poiIcons["sync"],
             isSelected: false,
             zoomThreshold: 0,
@@ -2158,6 +2169,1646 @@
         }
     ];
 
+    var routers = [
+        //downtown
+        {
+            id: "downtownRouter1",
+            position: transCoord(3989,1577),
+            icon: poiIcons["router"],
+            isSelected: false,
+            zoomThreshold: 0,
+            title: `<span style="color: white; font-family: 'Jura'; font-size: 24px; font-weight: normal;">XP Router</span>`,
+            content: `
+                <img src="images/icons/lol.png" alt="XP Router" style="width: 100%; border-radius: 8px; margin-bottom: 10px;">
+                <p><span style="color: white; font-family: 'Source Sans 3'; font-weight: 300;">XP Router.</span></p>
+            `
+        },
+        {
+            id: "downtownRouter2",
+            position: transCoord(4630,1662),
+            icon: poiIcons["router"],
+            isSelected: false,
+            zoomThreshold: 0,
+            title: `<span style="color: white; font-family: 'Jura'; font-size: 24px; font-weight: normal;">XP Router</span>`,
+            content: `
+                <img src="images/icons/lol.png" alt="XP Router" style="width: 100%; border-radius: 8px; margin-bottom: 10px;">
+                <p><span style="color: white; font-family: 'Source Sans 3'; font-weight: 300;">XP Router.</span></p>
+            `
+        },
+        {
+            id: "downtownRouter3",
+            position: transCoord(4543,1701),
+            icon: poiIcons["router"],
+            isSelected: false,
+            zoomThreshold: 0,
+            title: `<span style="color: white; font-family: 'Jura'; font-size: 24px; font-weight: normal;">XP Router</span>`,
+            content: `
+                <img src="images/icons/lol.png" alt="XP Router" style="width: 100%; border-radius: 8px; margin-bottom: 10px;">
+                <p><span style="color: white; font-family: 'Source Sans 3'; font-weight: 300;">XP Router.</span></p>
+            `
+        },
+        {
+            id: "downtownRouter4",
+            position: transCoord(3575,1792),
+            icon: poiIcons["router"],
+            isSelected: false,
+            zoomThreshold: 0,
+            title: `<span style="color: white; font-family: 'Jura'; font-size: 24px; font-weight: normal;">XP Router</span>`,
+            content: `
+                <img src="images/icons/lol.png" alt="XP Router" style="width: 100%; border-radius: 8px; margin-bottom: 10px;">
+                <p><span style="color: white; font-family: 'Source Sans 3'; font-weight: 300;">XP Router.</span></p>
+            `
+        },
+        {
+            id: "downtownRouter5",
+            position: transCoord(3893,1864),
+            icon: poiIcons["router"],
+            isSelected: false,
+            zoomThreshold: 0,
+            title: `<span style="color: white; font-family: 'Jura'; font-size: 24px; font-weight: normal;">XP Router</span>`,
+            content: `
+                <img src="images/icons/lol.png" alt="XP Router" style="width: 100%; border-radius: 8px; margin-bottom: 10px;">
+                <p><span style="color: white; font-family: 'Source Sans 3'; font-weight: 300;">XP Router.</span></p>
+            `
+        },
+        {
+            id: "downtownRouter6",
+            position: transCoord(4355,1885),
+            icon: poiIcons["router"],
+            isSelected: false,
+            zoomThreshold: 0,
+            title: `<span style="color: white; font-family: 'Jura'; font-size: 24px; font-weight: normal;">XP Router</span>`,
+            content: `
+                <img src="images/icons/lol.png" alt="XP Router" style="width: 100%; border-radius: 8px; margin-bottom: 10px;">
+                <p><span style="color: white; font-family: 'Source Sans 3'; font-weight: 300;">XP Router.</span></p>
+            `
+        },
+        {
+            id: "downtownRouter7",
+            position: transCoord(4069,1929),
+            icon: poiIcons["router"],
+            isSelected: false,
+            zoomThreshold: 0,
+            title: `<span style="color: white; font-family: 'Jura'; font-size: 24px; font-weight: normal;">XP Router</span>`,
+            content: `
+                <img src="images/icons/lol.png" alt="XP Router" style="width: 100%; border-radius: 8px; margin-bottom: 10px;">
+                <p><span style="color: white; font-family: 'Source Sans 3'; font-weight: 300;">XP Router.</span></p>
+            `
+        },
+        {
+            id: "downtownRouter8",
+            position: transCoord(3373,2000),
+            icon: poiIcons["router"],
+            isSelected: false,
+            zoomThreshold: 0,
+            title: `<span style="color: white; font-family: 'Jura'; font-size: 24px; font-weight: normal;">XP Router</span>`,
+            content: `
+                <img src="images/icons/lol.png" alt="XP Router" style="width: 100%; border-radius: 8px; margin-bottom: 10px;">
+                <p><span style="color: white; font-family: 'Source Sans 3'; font-weight: 300;">XP Router.</span></p>
+            `
+        },
+        {
+            id: "downtownRouter9",
+            position: transCoord(3873,2029),
+            icon: poiIcons["router"],
+            isSelected: false,
+            zoomThreshold: 0,
+            title: `<span style="color: white; font-family: 'Jura'; font-size: 24px; font-weight: normal;">XP Router</span>`,
+            content: `
+                <img src="images/icons/lol.png" alt="XP Router" style="width: 100%; border-radius: 8px; margin-bottom: 10px;">
+                <p><span style="color: white; font-family: 'Source Sans 3'; font-weight: 300;">XP Router.</span></p>
+            `
+        },
+        {
+            id: "downtownRouter10",
+            position: transCoord(3800,2082),
+            icon: poiIcons["router"],
+            isSelected: false,
+            zoomThreshold: 0,
+            title: `<span style="color: white; font-family: 'Jura'; font-size: 24px; font-weight: normal;">XP Router</span>`,
+            content: `
+                <img src="images/icons/lol.png" alt="XP Router" style="width: 100%; border-radius: 8px; margin-bottom: 10px;">
+                <p><span style="color: white; font-family: 'Source Sans 3'; font-weight: 300;">XP Router.</span></p>
+            `
+        },
+        {
+            id: "downtownRouter11",
+            position: transCoord(4333,2089),
+            icon: poiIcons["router"],
+            isSelected: false,
+            zoomThreshold: 0,
+            title: `<span style="color: white; font-family: 'Jura'; font-size: 24px; font-weight: normal;">XP Router</span>`,
+            content: `
+                <img src="images/icons/lol.png" alt="XP Router" style="width: 100%; border-radius: 8px; margin-bottom: 10px;">
+                <p><span style="color: white; font-family: 'Source Sans 3'; font-weight: 300;">XP Router.</span></p>
+            `
+        },
+        {
+            id: "downtownRouter12",
+            position: transCoord(3478,2091),
+            icon: poiIcons["router"],
+            isSelected: false,
+            zoomThreshold: 0,
+            title: `<span style="color: white; font-family: 'Jura'; font-size: 24px; font-weight: normal;">XP Router</span>`,
+            content: `
+                <img src="images/icons/lol.png" alt="XP Router" style="width: 100%; border-radius: 8px; margin-bottom: 10px;">
+                <p><span style="color: white; font-family: 'Source Sans 3'; font-weight: 300;">XP Router.</span></p>
+            `
+        },
+        {
+            id: "downtownRouter13",
+            position: transCoord(3885,2201),
+            icon: poiIcons["router"],
+            isSelected: false,
+            zoomThreshold: 0,
+            title: `<span style="color: white; font-family: 'Jura'; font-size: 24px; font-weight: normal;">XP Router</span>`,
+            content: `
+                <img src="images/icons/lol.png" alt="XP Router" style="width: 100%; border-radius: 8px; margin-bottom: 10px;">
+                <p><span style="color: white; font-family: 'Source Sans 3'; font-weight: 300;">XP Router.</span></p>
+            `
+        },
+        {
+            id: "downtownRouter14",
+            position: transCoord(4064,2261),
+            icon: poiIcons["router"],
+            isSelected: false,
+            zoomThreshold: 0,
+            title: `<span style="color: white; font-family: 'Jura'; font-size: 24px; font-weight: normal;">XP Router</span>`,
+            content: `
+                <img src="images/icons/lol.png" alt="XP Router" style="width: 100%; border-radius: 8px; margin-bottom: 10px;">
+                <p><span style="color: white; font-family: 'Source Sans 3'; font-weight: 300;">XP Router.</span></p>
+            `
+        },
+        {
+            id: "downtownRouter15",
+            position: transCoord(4432,2350),
+            icon: poiIcons["router"],
+            isSelected: false,
+            zoomThreshold: 0,
+            title: `<span style="color: white; font-family: 'Jura'; font-size: 24px; font-weight: normal;">XP Router</span>`,
+            content: `
+                <img src="images/icons/lol.png" alt="XP Router" style="width: 100%; border-radius: 8px; margin-bottom: 10px;">
+                <p><span style="color: white; font-family: 'Source Sans 3'; font-weight: 300;">XP Router.</span></p>
+            `
+        },
+        {
+            id: "downtownRouter16",
+            position: transCoord(3492,2382),
+            icon: poiIcons["router"],
+            isSelected: false,
+            zoomThreshold: 0,
+            title: `<span style="color: white; font-family: 'Jura'; font-size: 24px; font-weight: normal;">XP Router</span>`,
+            content: `
+                <img src="images/icons/lol.png" alt="XP Router" style="width: 100%; border-radius: 8px; margin-bottom: 10px;">
+                <p><span style="color: white; font-family: 'Source Sans 3'; font-weight: 300;">XP Router.</span></p>
+            `
+        },
+        {
+            id: "downtownRouter17",
+            position: transCoord(4679,2452),
+            icon: poiIcons["router"],
+            isSelected: false,
+            zoomThreshold: 0,
+            title: `<span style="color: white; font-family: 'Jura'; font-size: 24px; font-weight: normal;">XP Router</span>`,
+            content: `
+                <img src="images/icons/lol.png" alt="XP Router" style="width: 100%; border-radius: 8px; margin-bottom: 10px;">
+                <p><span style="color: white; font-family: 'Source Sans 3'; font-weight: 300;">XP Router.</span></p>
+            `
+        },
+        {
+            id: "downtownRouter18",
+            position: transCoord(4492,2481),
+            icon: poiIcons["router"],
+            isSelected: false,
+            zoomThreshold: 0,
+            title: `<span style="color: white; font-family: 'Jura'; font-size: 24px; font-weight: normal;">XP Router</span>`,
+            content: `
+                <img src="images/icons/lol.png" alt="XP Router" style="width: 100%; border-radius: 8px; margin-bottom: 10px;">
+                <p><span style="color: white; font-family: 'Source Sans 3'; font-weight: 300;">XP Router.</span></p>
+            `
+        },
+        {
+            id: "downtownRouter19",
+            position: transCoord(3933,2482),
+            icon: poiIcons["router"],
+            isSelected: false,
+            zoomThreshold: 0,
+            title: `<span style="color: white; font-family: 'Jura'; font-size: 24px; font-weight: normal;">XP Router</span>`,
+            content: `
+                <img src="images/icons/lol.png" alt="XP Router" style="width: 100%; border-radius: 8px; margin-bottom: 10px;">
+                <p><span style="color: white; font-family: 'Source Sans 3'; font-weight: 300;">XP Router.</span></p>
+            `
+        },
+        {
+            id: "downtownRouter20",
+            position: transCoord(4235,2533),
+            icon: poiIcons["router"],
+            isSelected: false,
+            zoomThreshold: 0,
+            title: `<span style="color: white; font-family: 'Jura'; font-size: 24px; font-weight: normal;">XP Router</span>`,
+            content: `
+                <img src="images/icons/lol.png" alt="XP Router" style="width: 100%; border-radius: 8px; margin-bottom: 10px;">
+                <p><span style="color: white; font-family: 'Source Sans 3'; font-weight: 300;">XP Router.</span></p>
+            `
+        },
+        {
+            id: "downtownRouter21",
+            position: transCoord(4168,2574),
+            icon: poiIcons["router"],
+            isSelected: false,
+            zoomThreshold: 0,
+            title: `<span style="color: white; font-family: 'Jura'; font-size: 24px; font-weight: normal;">XP Router</span>`,
+            content: `
+                <img src="images/icons/lol.png" alt="XP Router" style="width: 100%; border-radius: 8px; margin-bottom: 10px;">
+                <p><span style="color: white; font-family: 'Source Sans 3'; font-weight: 300;">XP Router.</span></p>
+            `
+        },
+        {
+            id: "downtownRouter22",
+            position: transCoord(3896,2575),
+            icon: poiIcons["router"],
+            isSelected: false,
+            zoomThreshold: 0,
+            title: `<span style="color: white; font-family: 'Jura'; font-size: 24px; font-weight: normal;">XP Router</span>`,
+            content: `
+                <img src="images/icons/lol.png" alt="XP Router" style="width: 100%; border-radius: 8px; margin-bottom: 10px;">
+                <p><span style="color: white; font-family: 'Source Sans 3'; font-weight: 300;">XP Router.</span></p>
+            `
+        },
+        {
+            id: "downtownRouter23",
+            position: transCoord(3616,2650),
+            icon: poiIcons["router"],
+            isSelected: false,
+            zoomThreshold: 0,
+            title: `<span style="color: white; font-family: 'Jura'; font-size: 24px; font-weight: normal;">XP Router</span>`,
+            content: `
+                <img src="images/icons/lol.png" alt="XP Router" style="width: 100%; border-radius: 8px; margin-bottom: 10px;">
+                <p><span style="color: white; font-family: 'Source Sans 3'; font-weight: 300;">XP Router.</span></p>
+            `
+        },
+        {
+            id: "downtownRouter24",
+            position: transCoord(3870,2675),
+            icon: poiIcons["router"],
+            isSelected: false,
+            zoomThreshold: 0,
+            title: `<span style="color: white; font-family: 'Jura'; font-size: 24px; font-weight: normal;">XP Router</span>`,
+            content: `
+                <img src="images/icons/lol.png" alt="XP Router" style="width: 100%; border-radius: 8px; margin-bottom: 10px;">
+                <p><span style="color: white; font-family: 'Source Sans 3'; font-weight: 300;">XP Router.</span></p>
+            `
+        },
+        {
+            id: "downtownRouter25",
+            position: transCoord(3473,2727),
+            icon: poiIcons["router"],
+            isSelected: false,
+            zoomThreshold: 0,
+            title: `<span style="color: white; font-family: 'Jura'; font-size: 24px; font-weight: normal;">XP Router</span>`,
+            content: `
+                <img src="images/icons/lol.png" alt="XP Router" style="width: 100%; border-radius: 8px; margin-bottom: 10px;">
+                <p><span style="color: white; font-family: 'Source Sans 3'; font-weight: 300;">XP Router.</span></p>
+            `
+        },
+        {
+            id: "downtownRouter26",
+            position: transCoord(3796,2824),
+            icon: poiIcons["router"],
+            isSelected: false,
+            zoomThreshold: 0,
+            title: `<span style="color: white; font-family: 'Jura'; font-size: 24px; font-weight: normal;">XP Router</span>`,
+            content: `
+                <img src="images/icons/lol.png" alt="XP Router" style="width: 100%; border-radius: 8px; margin-bottom: 10px;">
+                <p><span style="color: white; font-family: 'Source Sans 3'; font-weight: 300;">XP Router.</span></p>
+            `
+        },
+        {
+            id: "downtownRouter27",
+            position: transCoord(3729,2889),
+            icon: poiIcons["router"],
+            isSelected: false,
+            zoomThreshold: 0,
+            title: `<span style="color: white; font-family: 'Jura'; font-size: 24px; font-weight: normal;">XP Router</span>`,
+            content: `
+                <img src="images/icons/lol.png" alt="XP Router" style="width: 100%; border-radius: 8px; margin-bottom: 10px;">
+                <p><span style="color: white; font-family: 'Source Sans 3'; font-weight: 300;">XP Router.</span></p>
+            `
+        },
+        {
+            id: "downtownRouter28",
+            position: transCoord(4016,2900),
+            icon: poiIcons["router"],
+            isSelected: false,
+            zoomThreshold: 0,
+            title: `<span style="color: white; font-family: 'Jura'; font-size: 24px; font-weight: normal;">XP Router</span>`,
+            content: `
+                <img src="images/icons/lol.png" alt="XP Router" style="width: 100%; border-radius: 8px; margin-bottom: 10px;">
+                <p><span style="color: white; font-family: 'Source Sans 3'; font-weight: 300;">XP Router.</span></p>
+            `
+        },
+        {
+            id: "downtownRouter29",
+            position: transCoord(3402,3029),
+            icon: poiIcons["router"],
+            isSelected: false,
+            zoomThreshold: 0,
+            title: `<span style="color: white; font-family: 'Jura'; font-size: 24px; font-weight: normal;">XP Router</span>`,
+            content: `
+                <img src="images/icons/lol.png" alt="XP Router" style="width: 100%; border-radius: 8px; margin-bottom: 10px;">
+                <p><span style="color: white; font-family: 'Source Sans 3'; font-weight: 300;">XP Router.</span></p>
+            `
+        },
+        {
+            id: "downtownRouter30",
+            position: transCoord(3443,3084),
+            icon: poiIcons["router"],
+            isSelected: false,
+            zoomThreshold: 0,
+            title: `<span style="color: white; font-family: 'Jura'; font-size: 24px; font-weight: normal;">XP Router</span>`,
+            content: `
+                <img src="images/icons/lol.png" alt="XP Router" style="width: 100%; border-radius: 8px; margin-bottom: 10px;">
+                <p><span style="color: white; font-family: 'Source Sans 3'; font-weight: 300;">XP Router.</span></p>
+            `
+        },
+        {
+            id: "downtownRouter31",
+            position: transCoord(3732,3086),
+            icon: poiIcons["router"],
+            isSelected: false,
+            zoomThreshold: 0,
+            title: `<span style="color: white; font-family: 'Jura'; font-size: 24px; font-weight: normal;">XP Router</span>`,
+            content: `
+                <img src="images/icons/lol.png" alt="XP Router" style="width: 100%; border-radius: 8px; margin-bottom: 10px;">
+                <p><span style="color: white; font-family: 'Source Sans 3'; font-weight: 300;">XP Router.</span></p>
+            `
+        },
+        {
+            id: "downtownRouter32",
+            position: transCoord(3702,3163),
+            icon: poiIcons["router"],
+            isSelected: false,
+            zoomThreshold: 0,
+            title: `<span style="color: white; font-family: 'Jura'; font-size: 24px; font-weight: normal;">XP Router</span>`,
+            content: `
+                <img src="images/icons/lol.png" alt="XP Router" style="width: 100%; border-radius: 8px; margin-bottom: 10px;">
+                <p><span style="color: white; font-family: 'Source Sans 3'; font-weight: 300;">XP Router.</span></p>
+            `
+        },
+        {
+            id: "downtownRouter33",
+            position: transCoord(4005,3172),
+            icon: poiIcons["router"],
+            isSelected: false,
+            zoomThreshold: 0,
+            title: `<span style="color: white; font-family: 'Jura'; font-size: 24px; font-weight: normal;">XP Router</span>`,
+            content: `
+                <img src="images/icons/lol.png" alt="XP Router" style="width: 100%; border-radius: 8px; margin-bottom: 10px;">
+                <p><span style="color: white; font-family: 'Source Sans 3'; font-weight: 300;">XP Router.</span></p>
+            `
+        },
+
+        // dirwik
+        {
+            id: "dirwikRouter1",
+            position: transCoord(2745,1298),
+            icon: poiIcons["router"],
+            isSelected: false,
+            zoomThreshold: 0,
+            title: `<span style="color: white; font-family: 'Jura'; font-size: 24px; font-weight: normal;">XP Router</span>`,
+            content: `
+                <img src="images/icons/lol.png" alt="XP Router" style="width: 100%; border-radius: 8px; margin-bottom: 10px;">
+                <p><span style="color: white; font-family: 'Source Sans 3'; font-weight: 300;">XP Router.</span></p>
+            `
+        },
+        {
+            id: "dirwikRouter2",
+            position: transCoord(2809,1543),
+            icon: poiIcons["router"],
+            isSelected: false,
+            zoomThreshold: 0,
+            title: `<span style="color: white; font-family: 'Jura'; font-size: 24px; font-weight: normal;">XP Router</span>`,
+            content: `
+                <img src="images/icons/lol.png" alt="XP Router" style="width: 100%; border-radius: 8px; margin-bottom: 10px;">
+                <p><span style="color: white; font-family: 'Source Sans 3'; font-weight: 300;">XP Router.</span></p>
+            `
+        },
+        {
+            id: "dirwikRouter3",
+            position: transCoord(3047,1573),
+            icon: poiIcons["router"],
+            isSelected: false,
+            zoomThreshold: 0,
+            title: `<span style="color: white; font-family: 'Jura'; font-size: 24px; font-weight: normal;">XP Router</span>`,
+            content: `
+                <img src="images/icons/lol.png" alt="XP Router" style="width: 100%; border-radius: 8px; margin-bottom: 10px;">
+                <p><span style="color: white; font-family: 'Source Sans 3'; font-weight: 300;">XP Router.</span></p>
+            `
+        },
+        {
+            id: "dirwikRouter4",
+            position: transCoord(2492,1591),
+            icon: poiIcons["router"],
+            isSelected: false,
+            zoomThreshold: 0,
+            title: `<span style="color: white; font-family: 'Jura'; font-size: 24px; font-weight: normal;">XP Router</span>`,
+            content: `
+                <img src="images/icons/lol.png" alt="XP Router" style="width: 100%; border-radius: 8px; margin-bottom: 10px;">
+                <p><span style="color: white; font-family: 'Source Sans 3'; font-weight: 300;">XP Router.</span></p>
+            `
+        },
+        {
+            id: "dirwikRouter5",
+            position: transCoord(2481,1640),
+            icon: poiIcons["router"],
+            isSelected: false,
+            zoomThreshold: 0,
+            title: `<span style="color: white; font-family: 'Jura'; font-size: 24px; font-weight: normal;">XP Router</span>`,
+            content: `
+                <img src="images/icons/lol.png" alt="XP Router" style="width: 100%; border-radius: 8px; margin-bottom: 10px;">
+                <p><span style="color: white; font-family: 'Source Sans 3'; font-weight: 300;">XP Router.</span></p>
+            `
+        },
+        {
+            id: "dirwikRouter6",
+            position: transCoord(2896,1675),
+            icon: poiIcons["router"],
+            isSelected: false,
+            zoomThreshold: 0,
+            title: `<span style="color: white; font-family: 'Jura'; font-size: 24px; font-weight: normal;">XP Router</span>`,
+            content: `
+                <img src="images/icons/lol.png" alt="XP Router" style="width: 100%; border-radius: 8px; margin-bottom: 10px;">
+                <p><span style="color: white; font-family: 'Source Sans 3'; font-weight: 300;">XP Router.</span></p>
+            `
+        },
+        {
+            id: "dirwikRouter7",
+            position: transCoord(3180,1680),
+            icon: poiIcons["router"],
+            isSelected: false,
+            zoomThreshold: 0,
+            title: `<span style="color: white; font-family: 'Jura'; font-size: 24px; font-weight: normal;">XP Router</span>`,
+            content: `
+                <img src="images/icons/lol.png" alt="XP Router" style="width: 100%; border-radius: 8px; margin-bottom: 10px;">
+                <p><span style="color: white; font-family: 'Source Sans 3'; font-weight: 300;">XP Router.</span></p>
+            `
+        },
+        {
+            id: "dirwikRouter8",
+            position: transCoord(2451,1912),
+            icon: poiIcons["router"],
+            isSelected: false,
+            zoomThreshold: 0,
+            title: `<span style="color: white; font-family: 'Jura'; font-size: 24px; font-weight: normal;">XP Router</span>`,
+            content: `
+                <img src="images/icons/lol.png" alt="XP Router" style="width: 100%; border-radius: 8px; margin-bottom: 10px;">
+                <p><span style="color: white; font-family: 'Source Sans 3'; font-weight: 300;">XP Router.</span></p>
+            `
+        },
+        {
+            id: "dirwikRouter9",
+            position: transCoord(2677,1995),
+            icon: poiIcons["router"],
+            isSelected: false,
+            zoomThreshold: 0,
+            title: `<span style="color: white; font-family: 'Jura'; font-size: 24px; font-weight: normal;">XP Router</span>`,
+            content: `
+                <img src="images/icons/lol.png" alt="XP Router" style="width: 100%; border-radius: 8px; margin-bottom: 10px;">
+                <p><span style="color: white; font-family: 'Source Sans 3'; font-weight: 300;">XP Router.</span></p>
+            `
+        },
+        {
+            id: "dirwikRouter10",
+            position: transCoord(3021,2019),
+            icon: poiIcons["router"],
+            isSelected: false,
+            zoomThreshold: 0,
+            title: `<span style="color: white; font-family: 'Jura'; font-size: 24px; font-weight: normal;">XP Router</span>`,
+            content: `
+                <img src="images/icons/lol.png" alt="XP Router" style="width: 100%; border-radius: 8px; margin-bottom: 10px;">
+                <p><span style="color: white; font-family: 'Source Sans 3'; font-weight: 300;">XP Router.</span></p>
+            `
+        },
+        {
+            id: "dirwikRouter11",
+            position: transCoord(3194,2119),
+            icon: poiIcons["router"],
+            isSelected: false,
+            zoomThreshold: 0,
+            title: `<span style="color: white; font-family: 'Jura'; font-size: 24px; font-weight: normal;">XP Router</span>`,
+            content: `
+                <img src="images/icons/lol.png" alt="XP Router" style="width: 100%; border-radius: 8px; margin-bottom: 10px;">
+                <p><span style="color: white; font-family: 'Source Sans 3'; font-weight: 300;">XP Router.</span></p>
+            `
+        },
+        {
+            id: "dirwikRouter12",
+            position: transCoord(3212,2350),
+            icon: poiIcons["router"],
+            isSelected: false,
+            zoomThreshold: 0,
+            title: `<span style="color: white; font-family: 'Jura'; font-size: 24px; font-weight: normal;">XP Router</span>`,
+            content: `
+                <img src="images/icons/lol.png" alt="XP Router" style="width: 100%; border-radius: 8px; margin-bottom: 10px;">
+                <p><span style="color: white; font-family: 'Source Sans 3'; font-weight: 300;">XP Router.</span></p>
+            `
+        },
+        {
+            id: "dirwikRouter13",
+            position: transCoord(3071,2368),
+            icon: poiIcons["router"],
+            isSelected: false,
+            zoomThreshold: 0,
+            title: `<span style="color: white; font-family: 'Jura'; font-size: 24px; font-weight: normal;">XP Router</span>`,
+            content: `
+                <img src="images/icons/lol.png" alt="XP Router" style="width: 100%; border-radius: 8px; margin-bottom: 10px;">
+                <p><span style="color: white; font-family: 'Source Sans 3'; font-weight: 300;">XP Router.</span></p>
+            `
+        },
+        {
+            id: "dirwikRouter14",
+            position: transCoord(2834,2382),
+            icon: poiIcons["router"],
+            isSelected: false,
+            zoomThreshold: 0,
+            title: `<span style="color: white; font-family: 'Jura'; font-size: 24px; font-weight: normal;">XP Router</span>`,
+            content: `
+                <img src="images/icons/lol.png" alt="XP Router" style="width: 100%; border-radius: 8px; margin-bottom: 10px;">
+                <p><span style="color: white; font-family: 'Source Sans 3'; font-weight: 300;">XP Router.</span></p>
+            `
+        },
+        {
+            id: "dirwikRouter15",
+            position: transCoord(2493,2555),
+            icon: poiIcons["router"],
+            isSelected: false,
+            zoomThreshold: 0,
+            title: `<span style="color: white; font-family: 'Jura'; font-size: 24px; font-weight: normal;">XP Router</span>`,
+            content: `
+                <img src="images/icons/lol.png" alt="XP Router" style="width: 100%; border-radius: 8px; margin-bottom: 10px;">
+                <p><span style="color: white; font-family: 'Source Sans 3'; font-weight: 300;">XP Router.</span></p>
+            `
+        },
+        {
+            id: "dirwikRouter16",
+            position: transCoord(2624,2672),
+            icon: poiIcons["router"],
+            isSelected: false,
+            zoomThreshold: 0,
+            title: `<span style="color: white; font-family: 'Jura'; font-size: 24px; font-weight: normal;">XP Router</span>`,
+            content: `
+                <img src="images/icons/lol.png" alt="XP Router" style="width: 100%; border-radius: 8px; margin-bottom: 10px;">
+                <p><span style="color: white; font-family: 'Source Sans 3'; font-weight: 300;">XP Router.</span></p>
+            `
+        },
+        {
+            id: "dirwikRouter17",
+            position: transCoord(3041,2817),
+            icon: poiIcons["router"],
+            isSelected: false,
+            zoomThreshold: 0,
+            title: `<span style="color: white; font-family: 'Jura'; font-size: 24px; font-weight: normal;">XP Router</span>`,
+            content: `
+                <img src="images/icons/lol.png" alt="XP Router" style="width: 100%; border-radius: 8px; margin-bottom: 10px;">
+                <p><span style="color: white; font-family: 'Source Sans 3'; font-weight: 300;">XP Router.</span></p>
+            `
+        },
+        {
+            id: "dirwikRouter18",
+            position: transCoord(2684,3016),
+            icon: poiIcons["router"],
+            isSelected: false,
+            zoomThreshold: 0,
+            title: `<span style="color: white; font-family: 'Jura'; font-size: 24px; font-weight: normal;">XP Router</span>`,
+            content: `
+                <img src="images/icons/lol.png" alt="XP Router" style="width: 100%; border-radius: 8px; margin-bottom: 10px;">
+                <p><span style="color: white; font-family: 'Source Sans 3'; font-weight: 300;">XP Router.</span></p>
+            `
+        },
+        {
+            id: "dirwikRouter19",
+            position: transCoord(2429,3090),
+            icon: poiIcons["router"],
+            isSelected: false,
+            zoomThreshold: 0,
+            title: `<span style="color: white; font-family: 'Jura'; font-size: 24px; font-weight: normal;">XP Router</span>`,
+            content: `
+                <img src="images/icons/lol.png" alt="XP Router" style="width: 100%; border-radius: 8px; margin-bottom: 10px;">
+                <p><span style="color: white; font-family: 'Source Sans 3'; font-weight: 300;">XP Router.</span></p>
+            `
+        },
+        {
+            id: "dirwikRouter20",
+            position: transCoord(3279,3094),
+            icon: poiIcons["router"],
+            isSelected: false,
+            zoomThreshold: 0,
+            title: `<span style="color: white; font-family: 'Jura'; font-size: 24px; font-weight: normal;">XP Router</span>`,
+            content: `
+                <img src="images/icons/lol.png" alt="XP Router" style="width: 100%; border-radius: 8px; margin-bottom: 10px;">
+                <p><span style="color: white; font-family: 'Source Sans 3'; font-weight: 300;">XP Router.</span></p>
+            `
+        },
+        {
+            id: "dirwikRouter21",
+            position: transCoord(2684,3107),
+            icon: poiIcons["router"],
+            isSelected: false,
+            zoomThreshold: 0,
+            title: `<span style="color: white; font-family: 'Jura'; font-size: 24px; font-weight: normal;">XP Router</span>`,
+            content: `
+                <img src="images/icons/lol.png" alt="XP Router" style="width: 100%; border-radius: 8px; margin-bottom: 10px;">
+                <p><span style="color: white; font-family: 'Source Sans 3'; font-weight: 300;">XP Router.</span></p>
+            `
+        },
+        {
+            id: "dirwikRouter22",
+            position: transCoord(3008,3238),
+            icon: poiIcons["router"],
+            isSelected: false,
+            zoomThreshold: 0,
+            title: `<span style="color: white; font-family: 'Jura'; font-size: 24px; font-weight: normal;">XP Router</span>`,
+            content: `
+                <img src="images/icons/lol.png" alt="XP Router" style="width: 100%; border-radius: 8px; margin-bottom: 10px;">
+                <p><span style="color: white; font-family: 'Source Sans 3'; font-weight: 300;">XP Router.</span></p>
+            `
+        },
+        {
+            id: "dirwikRouter23",
+            position: transCoord(2439,3265),
+            icon: poiIcons["router"],
+            isSelected: false,
+            zoomThreshold: 0,
+            title: `<span style="color: white; font-family: 'Jura'; font-size: 24px; font-weight: normal;">XP Router</span>`,
+            content: `
+                <img src="images/icons/lol.png" alt="XP Router" style="width: 100%; border-radius: 8px; margin-bottom: 10px;">
+                <p><span style="color: white; font-family: 'Source Sans 3'; font-weight: 300;">XP Router.</span></p>
+            `
+        },
+        {
+            id: "dirwikRouter24",
+            position: transCoord(3327,3376),
+            icon: poiIcons["router"],
+            isSelected: false,
+            zoomThreshold: 0,
+            title: `<span style="color: white; font-family: 'Jura'; font-size: 24px; font-weight: normal;">XP Router</span>`,
+            content: `
+                <img src="images/icons/lol.png" alt="XP Router" style="width: 100%; border-radius: 8px; margin-bottom: 10px;">
+                <p><span style="color: white; font-family: 'Source Sans 3'; font-weight: 300;">XP Router.</span></p>
+            `
+        },
+        {
+            id: "dirwikRouter25",
+            position: transCoord(2875,3455),
+            icon: poiIcons["router"],
+            isSelected: false,
+            zoomThreshold: 0,
+            title: `<span style="color: white; font-family: 'Jura'; font-size: 24px; font-weight: normal;">XP Router</span>`,
+            content: `
+                <img src="images/icons/lol.png" alt="XP Router" style="width: 100%; border-radius: 8px; margin-bottom: 10px;">
+                <p><span style="color: white; font-family: 'Source Sans 3'; font-weight: 300;">XP Router.</span></p>
+            `
+        },
+        {
+            id: "dirwikRouter26",
+            position: transCoord(2515,3577),
+            icon: poiIcons["router"],
+            isSelected: false,
+            zoomThreshold: 0,
+            title: `<span style="color: white; font-family: 'Jura'; font-size: 24px; font-weight: normal;">XP Router</span>`,
+            content: `
+                <img src="images/icons/lol.png" alt="XP Router" style="width: 100%; border-radius: 8px; margin-bottom: 10px;">
+                <p><span style="color: white; font-family: 'Source Sans 3'; font-weight: 300;">XP Router.</span></p>
+            `
+        },
+        {
+            id: "dirwikRouter27",
+            position: transCoord(3045,3618),
+            icon: poiIcons["router"],
+            isSelected: false,
+            zoomThreshold: 0,
+            title: `<span style="color: white; font-family: 'Jura'; font-size: 24px; font-weight: normal;">XP Router</span>`,
+            content: `
+                <img src="images/icons/lol.png" alt="XP Router" style="width: 100%; border-radius: 8px; margin-bottom: 10px;">
+                <p><span style="color: white; font-family: 'Source Sans 3'; font-weight: 300;">XP Router.</span></p>
+            `
+        },
+        {
+            id: "dirwikRouter28",
+            position: transCoord(3076,3856),
+            icon: poiIcons["router"],
+            isSelected: false,
+            zoomThreshold: 0,
+            title: `<span style="color: white; font-family: 'Jura'; font-size: 24px; font-weight: normal;">XP Router</span>`,
+            content: `
+                <img src="images/icons/lol.png" alt="XP Router" style="width: 100%; border-radius: 8px; margin-bottom: 10px;">
+                <p><span style="color: white; font-family: 'Source Sans 3'; font-weight: 300;">XP Router.</span></p>
+            `
+        },
+        {
+            id: "dirwikRouter29",
+            position: transCoord(2937,4099),
+            icon: poiIcons["router"],
+            isSelected: false,
+            zoomThreshold: 0,
+            title: `<span style="color: white; font-family: 'Jura'; font-size: 24px; font-weight: normal;">XP Router</span>`,
+            content: `
+                <img src="images/icons/lol.png" alt="XP Router" style="width: 100%; border-radius: 8px; margin-bottom: 10px;">
+                <p><span style="color: white; font-family: 'Source Sans 3'; font-weight: 300;">XP Router.</span></p>
+            `
+        },
+        {
+            id: "dirwikRouter30",
+            position: transCoord(2549,4243),
+            icon: poiIcons["router"],
+            isSelected: false,
+            zoomThreshold: 0,
+            title: `<span style="color: white; font-family: 'Jura'; font-size: 24px; font-weight: normal;">XP Router</span>`,
+            content: `
+                <img src="images/icons/lol.png" alt="XP Router" style="width: 100%; border-radius: 8px; margin-bottom: 10px;">
+                <p><span style="color: white; font-family: 'Source Sans 3'; font-weight: 300;">XP Router.</span></p>
+            `
+        },
+        {
+            id: "dirwikRouter31",
+            position: transCoord(3148,4361),
+            icon: poiIcons["router"],
+            isSelected: false,
+            zoomThreshold: 0,
+            title: `<span style="color: white; font-family: 'Jura'; font-size: 24px; font-weight: normal;">XP Router</span>`,
+            content: `
+                <img src="images/icons/lol.png" alt="XP Router" style="width: 100%; border-radius: 8px; margin-bottom: 10px;">
+                <p><span style="color: white; font-family: 'Source Sans 3'; font-weight: 300;">XP Router.</span></p>
+            `
+        },
+        {
+            id: "dirwikRouter32",
+            position: transCoord(2570,4562),
+            icon: poiIcons["router"],
+            isSelected: false,
+            zoomThreshold: 0,
+            title: `<span style="color: white; font-family: 'Jura'; font-size: 24px; font-weight: normal;">XP Router</span>`,
+            content: `
+                <img src="images/icons/lol.png" alt="XP Router" style="width: 100%; border-radius: 8px; margin-bottom: 10px;">
+                <p><span style="color: white; font-family: 'Source Sans 3'; font-weight: 300;">XP Router.</span></p>
+            `
+        },
+
+        // fragment
+        {
+            id: "fragmentRouter1",
+            position: transCoord(4934,3483),
+            icon: poiIcons["router"],
+            isSelected: false,
+            zoomThreshold: 0,
+            title: `<span style="color: white; font-family: 'Jura'; font-size: 24px; font-weight: normal;">XP Router</span>`,
+            content: `
+                <img src="images/icons/lol.png" alt="XP Router" style="width: 100%; border-radius: 8px; margin-bottom: 10px;">
+                <p><span style="color: white; font-family: 'Source Sans 3'; font-weight: 300;">XP Router.</span></p>
+            `
+        },
+        {
+            id: "fragmentRouter2",
+            position: transCoord(4638,3413),
+            icon: poiIcons["router"],
+            isSelected: false,
+            zoomThreshold: 0,
+            title: `<span style="color: white; font-family: 'Jura'; font-size: 24px; font-weight: normal;">XP Router</span>`,
+            content: `
+                <img src="images/icons/lol.png" alt="XP Router" style="width: 100%; border-radius: 8px; margin-bottom: 10px;">
+                <p><span style="color: white; font-family: 'Source Sans 3'; font-weight: 300;">XP Router.</span></p>
+            `
+        },
+        {
+            id: "fragmentRouter3",
+            position: transCoord(4983,3380),
+            icon: poiIcons["router"],
+            isSelected: false,
+            zoomThreshold: 0,
+            title: `<span style="color: white; font-family: 'Jura'; font-size: 24px; font-weight: normal;">XP Router</span>`,
+            content: `
+                <img src="images/icons/lol.png" alt="XP Router" style="width: 100%; border-radius: 8px; margin-bottom: 10px;">
+                <p><span style="color: white; font-family: 'Source Sans 3'; font-weight: 300;">XP Router.</span></p>
+            `
+        },
+        {
+            id: "fragmentRouter4",
+            position: transCoord(4334,3291),
+            icon: poiIcons["router"],
+            isSelected: false,
+            zoomThreshold: 0,
+            title: `<span style="color: white; font-family: 'Jura'; font-size: 24px; font-weight: normal;">XP Router</span>`,
+            content: `
+                <img src="images/icons/lol.png" alt="XP Router" style="width: 100%; border-radius: 8px; margin-bottom: 10px;">
+                <p><span style="color: white; font-family: 'Source Sans 3'; font-weight: 300;">XP Router.</span></p>
+            `
+        },
+        {
+            id: "fragmentRouter5",
+            position: transCoord(4309,3191),
+            icon: poiIcons["router"],
+            isSelected: false,
+            zoomThreshold: 0,
+            title: `<span style="color: white; font-family: 'Jura'; font-size: 24px; font-weight: normal;">XP Router</span>`,
+            content: `
+                <img src="images/icons/lol.png" alt="XP Router" style="width: 100%; border-radius: 8px; margin-bottom: 10px;">
+                <p><span style="color: white; font-family: 'Source Sans 3'; font-weight: 300;">XP Router.</span></p>
+            `
+        },
+        {
+            id: "fragmentRouter6",
+            position: transCoord(4404,3099),
+            icon: poiIcons["router"],
+            isSelected: false,
+            zoomThreshold: 0,
+            title: `<span style="color: white; font-family: 'Jura'; font-size: 24px; font-weight: normal;">XP Router</span>`,
+            content: `
+                <img src="images/icons/lol.png" alt="XP Router" style="width: 100%; border-radius: 8px; margin-bottom: 10px;">
+                <p><span style="color: white; font-family: 'Source Sans 3'; font-weight: 300;">XP Router.</span></p>
+            `
+        },
+        {
+            id: "fragmentRouter7",
+            position: transCoord(4606,3076),
+            icon: poiIcons["router"],
+            isSelected: false,
+            zoomThreshold: 0,
+            title: `<span style="color: white; font-family: 'Jura'; font-size: 24px; font-weight: normal;">XP Router</span>`,
+            content: `
+                <img src="images/icons/lol.png" alt="XP Router" style="width: 100%; border-radius: 8px; margin-bottom: 10px;">
+                <p><span style="color: white; font-family: 'Source Sans 3'; font-weight: 300;">XP Router.</span></p>
+            `
+        },
+        {
+            id: "fragmentRouter8",
+            position: transCoord(4122,3011),
+            icon: poiIcons["router"],
+            isSelected: false,
+            zoomThreshold: 0,
+            title: `<span style="color: white; font-family: 'Jura'; font-size: 24px; font-weight: normal;">XP Router</span>`,
+            content: `
+                <img src="images/icons/lol.png" alt="XP Router" style="width: 100%; border-radius: 8px; margin-bottom: 10px;">
+                <p><span style="color: white; font-family: 'Source Sans 3'; font-weight: 300;">XP Router.</span></p>
+            `
+        },
+        {
+            id: "fragmentRouter9",
+            position: transCoord(4760,3010),
+            icon: poiIcons["router"],
+            isSelected: false,
+            zoomThreshold: 0,
+            title: `<span style="color: white; font-family: 'Jura'; font-size: 24px; font-weight: normal;">XP Router</span>`,
+            content: `
+                <img src="images/icons/lol.png" alt="XP Router" style="width: 100%; border-radius: 8px; margin-bottom: 10px;">
+                <p><span style="color: white; font-family: 'Source Sans 3'; font-weight: 300;">XP Router.</span></p>
+            `
+        },
+        {
+            id: "fragmentRouter10",
+            position: transCoord(4535,2895),
+            icon: poiIcons["router"],
+            isSelected: false,
+            zoomThreshold: 0,
+            title: `<span style="color: white; font-family: 'Jura'; font-size: 24px; font-weight: normal;">XP Router</span>`,
+            content: `
+                <img src="images/icons/lol.png" alt="XP Router" style="width: 100%; border-radius: 8px; margin-bottom: 10px;">
+                <p><span style="color: white; font-family: 'Source Sans 3'; font-weight: 300;">XP Router.</span></p>
+            `
+        },
+        {
+            id: "fragmentRouter11",
+            position: transCoord(4246,2890),
+            icon: poiIcons["router"],
+            isSelected: false,
+            zoomThreshold: 0,
+            title: `<span style="color: white; font-family: 'Jura'; font-size: 24px; font-weight: normal;">XP Router</span>`,
+            content: `
+                <img src="images/icons/lol.png" alt="XP Router" style="width: 100%; border-radius: 8px; margin-bottom: 10px;">
+                <p><span style="color: white; font-family: 'Source Sans 3'; font-weight: 300;">XP Router.</span></p>
+            `
+        },
+        {
+            id: "fragmentRouter12",
+            position: transCoord(4799,2870),
+            icon: poiIcons["router"],
+            isSelected: false,
+            zoomThreshold: 0,
+            title: `<span style="color: white; font-family: 'Jura'; font-size: 24px; font-weight: normal;">XP Router</span>`,
+            content: `
+                <img src="images/icons/lol.png" alt="XP Router" style="width: 100%; border-radius: 8px; margin-bottom: 10px;">
+                <p><span style="color: white; font-family: 'Source Sans 3'; font-weight: 300;">XP Router.</span></p>
+            `
+        },
+        {
+            id: "fragmentRouter13",
+            position: transCoord(4794,2772),
+            icon: poiIcons["router"],
+            isSelected: false,
+            zoomThreshold: 0,
+            title: `<span style="color: white; font-family: 'Jura'; font-size: 24px; font-weight: normal;">XP Router</span>`,
+            content: `
+                <img src="images/icons/lol.png" alt="XP Router" style="width: 100%; border-radius: 8px; margin-bottom: 10px;">
+                <p><span style="color: white; font-family: 'Source Sans 3'; font-weight: 300;">XP Router.</span></p>
+            `
+        },
+        {
+            id: "fragmentRouter14",
+            position: transCoord(4120,2765),
+            icon: poiIcons["router"],
+            isSelected: false,
+            zoomThreshold: 0,
+            title: `<span style="color: white; font-family: 'Jura'; font-size: 24px; font-weight: normal;">XP Router</span>`,
+            content: `
+                <img src="images/icons/lol.png" alt="XP Router" style="width: 100%; border-radius: 8px; margin-bottom: 10px;">
+                <p><span style="color: white; font-family: 'Source Sans 3'; font-weight: 300;">XP Router.</span></p>
+            `
+        },
+        {
+            id: "fragmentRouter15",
+            position: transCoord(4650,2756),
+            icon: poiIcons["router"],
+            isSelected: false,
+            zoomThreshold: 0,
+            title: `<span style="color: white; font-family: 'Jura'; font-size: 24px; font-weight: normal;">XP Router</span>`,
+            content: `
+                <img src="images/icons/lol.png" alt="XP Router" style="width: 100%; border-radius: 8px; margin-bottom: 10px;">
+                <p><span style="color: white; font-family: 'Source Sans 3'; font-weight: 300;">XP Router.</span></p>
+            `
+        },
+        {
+            id: "fragmentRouter16",
+            position: transCoord(4559,2751),
+            icon: poiIcons["router"],
+            isSelected: false,
+            zoomThreshold: 0,
+            title: `<span style="color: white; font-family: 'Jura'; font-size: 24px; font-weight: normal;">XP Router</span>`,
+            content: `
+                <img src="images/icons/lol.png" alt="XP Router" style="width: 100%; border-radius: 8px; margin-bottom: 10px;">
+                <p><span style="color: white; font-family: 'Source Sans 3'; font-weight: 300;">XP Router.</span></p>
+            `
+        },
+        {
+            id: "fragmentRouter17",
+            position: transCoord(4713,2650),
+            icon: poiIcons["router"],
+            isSelected: false,
+            zoomThreshold: 0,
+            title: `<span style="color: white; font-family: 'Jura'; font-size: 24px; font-weight: normal;">XP Router</span>`,
+            content: `
+                <img src="images/icons/lol.png" alt="XP Router" style="width: 100%; border-radius: 8px; margin-bottom: 10px;">
+                <p><span style="color: white; font-family: 'Source Sans 3'; font-weight: 300;">XP Router.</span></p>
+            `
+        },
+
+        // fragment - middle
+        {
+            id: "fragmentRouter18",
+            position: transCoord(4916,2897),
+            icon: poiIcons["router"],
+            isSelected: false,
+            zoomThreshold: 0,
+            title: `<span style="color: white; font-family: 'Jura'; font-size: 24px; font-weight: normal;">XP Router</span>`,
+            content: `
+                <img src="images/icons/lol.png" alt="XP Router" style="width: 100%; border-radius: 8px; margin-bottom: 10px;">
+                <p><span style="color: white; font-family: 'Source Sans 3'; font-weight: 300;">XP Router.</span></p>
+            `
+        },
+        {
+            id: "fragmentRouter19",
+            position: transCoord(5102,2892),
+            icon: poiIcons["router"],
+            isSelected: false,
+            zoomThreshold: 0,
+            title: `<span style="color: white; font-family: 'Jura'; font-size: 24px; font-weight: normal;">XP Router</span>`,
+            content: `
+                <img src="images/icons/lol.png" alt="XP Router" style="width: 100%; border-radius: 8px; margin-bottom: 10px;">
+                <p><span style="color: white; font-family: 'Source Sans 3'; font-weight: 300;">XP Router.</span></p>
+            `
+        },
+        {
+            id: "fragmentRouter20",
+            position: transCoord(4989,2728),
+            icon: poiIcons["router"],
+            isSelected: false,
+            zoomThreshold: 0,
+            title: `<span style="color: white; font-family: 'Jura'; font-size: 24px; font-weight: normal;">XP Router</span>`,
+            content: `
+                <img src="images/icons/lol.png" alt="XP Router" style="width: 100%; border-radius: 8px; margin-bottom: 10px;">
+                <p><span style="color: white; font-family: 'Source Sans 3'; font-weight: 300;">XP Router.</span></p>
+            `
+        },
+        {
+            id: "fragmentRouter21",
+            position: transCoord(4822,2470),
+            icon: poiIcons["router"],
+            isSelected: false,
+            zoomThreshold: 0,
+            title: `<span style="color: white; font-family: 'Jura'; font-size: 24px; font-weight: normal;">XP Router</span>`,
+            content: `
+                <img src="images/icons/lol.png" alt="XP Router" style="width: 100%; border-radius: 8px; margin-bottom: 10px;">
+                <p><span style="color: white; font-family: 'Source Sans 3'; font-weight: 300;">XP Router.</span></p>
+            `
+        },
+        {
+            id: "fragmentRouter22",
+            position: transCoord(5083,2426),
+            icon: poiIcons["router"],
+            isSelected: false,
+            zoomThreshold: 0,
+            title: `<span style="color: white; font-family: 'Jura'; font-size: 24px; font-weight: normal;">XP Router</span>`,
+            content: `
+                <img src="images/icons/lol.png" alt="XP Router" style="width: 100%; border-radius: 8px; margin-bottom: 10px;">
+                <p><span style="color: white; font-family: 'Source Sans 3'; font-weight: 300;">XP Router.</span></p>
+            `
+        },
+        {
+            id: "fragmentRouter23",
+            position: transCoord(4814,2321),
+            icon: poiIcons["router"],
+            isSelected: false,
+            zoomThreshold: 0,
+            title: `<span style="color: white; font-family: 'Jura'; font-size: 24px; font-weight: normal;">XP Router</span>`,
+            content: `
+                <img src="images/icons/lol.png" alt="XP Router" style="width: 100%; border-radius: 8px; margin-bottom: 10px;">
+                <p><span style="color: white; font-family: 'Source Sans 3'; font-weight: 300;">XP Router.</span></p>
+            `
+        },
+        {
+            id: "fragmentRouter24",
+            position: transCoord(5114,2274),
+            icon: poiIcons["router"],
+            isSelected: false,
+            zoomThreshold: 0,
+            title: `<span style="color: white; font-family: 'Jura'; font-size: 24px; font-weight: normal;">XP Router</span>`,
+            content: `
+                <img src="images/icons/lol.png" alt="XP Router" style="width: 100%; border-radius: 8px; margin-bottom: 10px;">
+                <p><span style="color: white; font-family: 'Source Sans 3'; font-weight: 300;">XP Router.</span></p>
+            `
+        },
+        {
+            id: "fragmentRouter25",
+            position: transCoord(5242,2240),
+            icon: poiIcons["router"],
+            isSelected: false,
+            zoomThreshold: 0,
+            title: `<span style="color: white; font-family: 'Jura'; font-size: 24px; font-weight: normal;">XP Router</span>`,
+            content: `
+                <img src="images/icons/lol.png" alt="XP Router" style="width: 100%; border-radius: 8px; margin-bottom: 10px;">
+                <p><span style="color: white; font-family: 'Source Sans 3'; font-weight: 300;">XP Router.</span></p>
+            `
+        },
+        {
+            id: "fragmentRouter26",
+            position: transCoord(4956,2164),
+            icon: poiIcons["router"],
+            isSelected: false,
+            zoomThreshold: 0,
+            title: `<span style="color: white; font-family: 'Jura'; font-size: 24px; font-weight: normal;">XP Router</span>`,
+            content: `
+                <img src="images/icons/lol.png" alt="XP Router" style="width: 100%; border-radius: 8px; margin-bottom: 10px;">
+                <p><span style="color: white; font-family: 'Source Sans 3'; font-weight: 300;">XP Router.</span></p>
+            `
+        },
+        {
+            id: "fragmentRouter27",
+            position: transCoord(5418,2161),
+            icon: poiIcons["router"],
+            isSelected: false,
+            zoomThreshold: 0,
+            title: `<span style="color: white; font-family: 'Jura'; font-size: 24px; font-weight: normal;">XP Router</span>`,
+            content: `
+                <img src="images/icons/lol.png" alt="XP Router" style="width: 100%; border-radius: 8px; margin-bottom: 10px;">
+                <p><span style="color: white; font-family: 'Source Sans 3'; font-weight: 300;">XP Router.</span></p>
+            `
+        },
+        {
+            id: "fragmentRouter28",
+            position: transCoord(4948,2095),
+            icon: poiIcons["router"],
+            isSelected: false,
+            zoomThreshold: 0,
+            title: `<span style="color: white; font-family: 'Jura'; font-size: 24px; font-weight: normal;">XP Router</span>`,
+            content: `
+                <img src="images/icons/lol.png" alt="XP Router" style="width: 100%; border-radius: 8px; margin-bottom: 10px;">
+                <p><span style="color: white; font-family: 'Source Sans 3'; font-weight: 300;">XP Router.</span></p>
+            `
+        },
+        {
+            id: "fragmentRouter29",
+            position: transCoord(5082,2037),
+            icon: poiIcons["router"],
+            isSelected: false,
+            zoomThreshold: 0,
+            title: `<span style="color: white; font-family: 'Jura'; font-size: 24px; font-weight: normal;">XP Router</span>`,
+            content: `
+                <img src="images/icons/lol.png" alt="XP Router" style="width: 100%; border-radius: 8px; margin-bottom: 10px;">
+                <p><span style="color: white; font-family: 'Source Sans 3'; font-weight: 300;">XP Router.</span></p>
+            `
+        },
+        {
+            id: "fragmentRouter30",
+            position: transCoord(5291,1995),
+            icon: poiIcons["router"],
+            isSelected: false,
+            zoomThreshold: 0,
+            title: `<span style="color: white; font-family: 'Jura'; font-size: 24px; font-weight: normal;">XP Router</span>`,
+            content: `
+                <img src="images/icons/lol.png" alt="XP Router" style="width: 100%; border-radius: 8px; margin-bottom: 10px;">
+                <p><span style="color: white; font-family: 'Source Sans 3'; font-weight: 300;">XP Router.</span></p>
+            `
+        },
+        {
+            id: "fragmentRouter31",
+            position: transCoord(5448,1984),
+            icon: poiIcons["router"],
+            isSelected: false,
+            zoomThreshold: 0,
+            title: `<span style="color: white; font-family: 'Jura'; font-size: 24px; font-weight: normal;">XP Router</span>`,
+            content: `
+                <img src="images/icons/lol.png" alt="XP Router" style="width: 100%; border-radius: 8px; margin-bottom: 10px;">
+                <p><span style="color: white; font-family: 'Source Sans 3'; font-weight: 300;">XP Router.</span></p>
+            `
+        },
+        {
+            id: "fragmentRouter32",
+            position: transCoord(5183,1974),
+            icon: poiIcons["router"],
+            isSelected: false,
+            zoomThreshold: 0,
+            title: `<span style="color: white; font-family: 'Jura'; font-size: 24px; font-weight: normal;">XP Router</span>`,
+            content: `
+                <img src="images/icons/lol.png" alt="XP Router" style="width: 100%; border-radius: 8px; margin-bottom: 10px;">
+                <p><span style="color: white; font-family: 'Source Sans 3'; font-weight: 300;">XP Router.</span></p>
+            `
+        },
+        {
+            id: "fragmentRouter33",
+            position: transCoord(4944,1913),
+            icon: poiIcons["router"],
+            isSelected: false,
+            zoomThreshold: 0,
+            title: `<span style="color: white; font-family: 'Jura'; font-size: 24px; font-weight: normal;">XP Router</span>`,
+            content: `
+                <img src="images/icons/lol.png" alt="XP Router" style="width: 100%; border-radius: 8px; margin-bottom: 10px;">
+                <p><span style="color: white; font-family: 'Source Sans 3'; font-weight: 300;">XP Router.</span></p>
+            `
+        },
+        {
+            id: "fragmentRouter34",
+            position: transCoord(5450,1892),
+            icon: poiIcons["router"],
+            isSelected: false,
+            zoomThreshold: 0,
+            title: `<span style="color: white; font-family: 'Jura'; font-size: 24px; font-weight: normal;">XP Router</span>`,
+            content: `
+                <img src="images/icons/lol.png" alt="XP Router" style="width: 100%; border-radius: 8px; margin-bottom: 10px;">
+                <p><span style="color: white; font-family: 'Source Sans 3'; font-weight: 300;">XP Router.</span></p>
+            `
+        },
+        {
+            id: "fragmentRouter35",
+            position: transCoord(5464,1759),
+            icon: poiIcons["router"],
+            isSelected: false,
+            zoomThreshold: 0,
+            title: `<span style="color: white; font-family: 'Jura'; font-size: 24px; font-weight: normal;">XP Router</span>`,
+            content: `
+                <img src="images/icons/lol.png" alt="XP Router" style="width: 100%; border-radius: 8px; margin-bottom: 10px;">
+                <p><span style="color: white; font-family: 'Source Sans 3'; font-weight: 300;">XP Router.</span></p>
+            `
+        },
+        {
+            id: "fragmentRouter36",
+            position: transCoord(4992,1735),
+            icon: poiIcons["router"],
+            isSelected: false,
+            zoomThreshold: 0,
+            title: `<span style="color: white; font-family: 'Jura'; font-size: 24px; font-weight: normal;">XP Router</span>`,
+            content: `
+                <img src="images/icons/lol.png" alt="XP Router" style="width: 100%; border-radius: 8px; margin-bottom: 10px;">
+                <p><span style="color: white; font-family: 'Source Sans 3'; font-weight: 300;">XP Router.</span></p>
+            `
+        },
+        {
+            id: "fragmentRouter37",
+            position: transCoord(5261,1604),
+            icon: poiIcons["router"],
+            isSelected: false,
+            zoomThreshold: 0,
+            title: `<span style="color: white; font-family: 'Jura'; font-size: 24px; font-weight: normal;">XP Router</span>`,
+            content: `
+                <img src="images/icons/lol.png" alt="XP Router" style="width: 100%; border-radius: 8px; margin-bottom: 10px;">
+                <p><span style="color: white; font-family: 'Source Sans 3'; font-weight: 300;">XP Router.</span></p>
+            `
+        },
+        {
+            id: "fragmentRouter38",
+            position: transCoord(5091,1540),
+            icon: poiIcons["router"],
+            isSelected: false,
+            zoomThreshold: 0,
+            title: `<span style="color: white; font-family: 'Jura'; font-size: 24px; font-weight: normal;">XP Router</span>`,
+            content: `
+                <img src="images/icons/lol.png" alt="XP Router" style="width: 100%; border-radius: 8px; margin-bottom: 10px;">
+                <p><span style="color: white; font-family: 'Source Sans 3'; font-weight: 300;">XP Router.</span></p>
+            `
+        },
+        {
+            id: "fragmentRouter39",
+            position: transCoord(5000,1536),
+            icon: poiIcons["router"],
+            isSelected: false,
+            zoomThreshold: 0,
+            title: `<span style="color: white; font-family: 'Jura'; font-size: 24px; font-weight: normal;">XP Router</span>`,
+            content: `
+                <img src="images/icons/lol.png" alt="XP Router" style="width: 100%; border-radius: 8px; margin-bottom: 10px;">
+                <p><span style="color: white; font-family: 'Source Sans 3'; font-weight: 300;">XP Router.</span></p>
+            `
+        },
+        {
+            id: "fragmentRouter40",
+            position: transCoord(5391,1443),
+            icon: poiIcons["router"],
+            isSelected: false,
+            zoomThreshold: 0,
+            title: `<span style="color: white; font-family: 'Jura'; font-size: 24px; font-weight: normal;">XP Router</span>`,
+            content: `
+                <img src="images/icons/lol.png" alt="XP Router" style="width: 100%; border-radius: 8px; margin-bottom: 10px;">
+                <p><span style="color: white; font-family: 'Source Sans 3'; font-weight: 300;">XP Router.</span></p>
+            `
+        },
+
+        //stack
+        {
+            id: "stackRouter0",
+            position: transCoord(3089,1377),
+            icon: poiIcons["router"],
+            isSelected: false,
+            zoomThreshold: 0,
+            title: `<span style="color: white; font-family: 'Jura'; font-size: 24px; font-weight: normal;">XP Router</span>`,
+            content: `
+                <img src="images/icons/lol.png" alt="XP Router" style="width: 100%; border-radius: 8px; margin-bottom: 10px;">
+                <p><span style="color: white; font-family: 'Source Sans 3'; font-weight: 300;">XP Router.</span></p>
+            `
+        },
+
+
+
+    ];
+
+    var transceivers = [
+
+        //downtown
+        {
+            id: "vertigoSpawnRegion",
+            position: transCoord(4332,1885),
+            icon: poiIcons["transceiver"],
+            isSelected: false,
+            zoomThreshold: -1.5,
+            title: `<span style="color: white; font-family: 'Jura'; font-size: 24px; font-weight: normal;">Vertigo</span>`,
+            content: `
+                <img src="images/icons/lol.png" alt="Vertigo" style="width: 100%; border-radius: 8px; margin-bottom: 10px;">
+                <p><span style="color: white; font-family: 'Source Sans 3'; font-weight: 300;">Vertigo spawn region.</span></p>
+            `
+        },
+        {
+            id: "glSpawnRegion",
+            position: transCoord(3340,2005),
+            icon: poiIcons["transceiver"],
+            isSelected: false,
+            zoomThreshold: -1.5,
+            title: `<span style="color: white; font-family: 'Jura'; font-size: 24px; font-weight: normal;">GL Transceiver</span>`,
+            content: `
+                <img src="images/icons/lol.png" alt="GL Transceiver" style="width: 100%; border-radius: 8px; margin-bottom: 10px;">
+                <p><span style="color: white; font-family: 'Source Sans 3'; font-weight: 300;">GL spawn region.</span></p>
+            `
+        },
+        {
+            id: "apolloSpawnRegion",
+            position: transCoord(3731,3052),
+            icon: poiIcons["transceiver"],
+            isSelected: false,
+            zoomThreshold: -1.5,
+            title: `<span style="color: white; font-family: 'Jura'; font-size: 24px; font-weight: normal;">Apollo</span>`,
+            content: `
+                <img src="images/icons/lol.png" alt="Apollo" style="width: 100%; border-radius: 8px; margin-bottom: 10px;">
+                <p><span style="color: white; font-family: 'Source Sans 3'; font-weight: 300;">Apollo spawn region.</span></p>
+            `
+        },
+
+        //dirwik
+        {
+            id: "glaiveSpawnRegion",
+            position: transCoord(2745,1991),
+            icon: poiIcons["transceiver"],
+            isSelected: false,
+            zoomThreshold: -1.5,
+            title: `<span style="color: white; font-family: 'Jura'; font-size: 24px; font-weight: normal;">Glaive Tower</span>`,
+            content: `
+                <img src="images/icons/lol.png" alt="Glaive Tower" style="width: 100%; border-radius: 8px; margin-bottom: 10px;">
+                <p><span style="color: white; font-family: 'Source Sans 3'; font-weight: 300;">Glaive Tower spawn region.</span></p>
+            `
+        },
+        {
+            id: "fogSpawnRegion",
+            position: transCoord(2902,2875),
+            icon: poiIcons["transceiver"],
+            isSelected: false,
+            zoomThreshold: -1.5,
+            title: `<span style="color: white; font-family: 'Jura'; font-size: 24px; font-weight: normal;">West Tower</span>`,
+            content: `
+                <img src="images/icons/lol.png" alt="West Tower" style="width: 100%; border-radius: 8px; margin-bottom: 10px;">
+                <p><span style="color: white; font-family: 'Source Sans 3'; font-weight: 300;">West Tower spawn region.</span></p>
+            `
+        },
+        {
+            id: "artemisSpawnRegion",
+            position: transCoord(2865,3465),
+            icon: poiIcons["transceiver"],
+            isSelected: false,
+            zoomThreshold: -1.5,
+            title: `<span style="color: white; font-family: 'Jura'; font-size: 24px; font-weight: normal;">Artemis</span>`,
+            content: `
+                <img src="images/icons/lol.png" alt="Artemis" style="width: 100%; border-radius: 8px; margin-bottom: 10px;">
+                <p><span style="color: white; font-family: 'Source Sans 3'; font-weight: 300;">Artemis spawn region.</span></p>
+            `
+        },
+
+        //fragment
+        {
+            id: "helipadSpawnRegion",
+            position: transCoord(4609,2884),
+            icon: poiIcons["transceiver"],
+            isSelected: false,
+            zoomThreshold: -1.5,
+            title: `<span style="color: white; font-family: 'Jura'; font-size: 24px; font-weight: normal;">Helipad Transceiver</span>`,
+            content: `
+                <img src="images/icons/lol.png" alt="Helipad Transceiver" style="width: 100%; border-radius: 8px; margin-bottom: 10px;">
+                <p><span style="color: white; font-family: 'Source Sans 3'; font-weight: 300;">Helipad spawn region.</span></p>
+            `
+        },
+        {
+            id: "unnamedSpawnRegion",   // crest is not the official name, now shush
+            position: transCoord(5185,1753),
+            icon: poiIcons["transceiver"],
+            isSelected: false,
+            zoomThreshold: -1.5,
+            title: `<span style="color: white; font-family: 'Jura'; font-size: 24px; font-weight: normal;">Crest</span>`,
+            content: `
+                <img src="images/icons/lol.png" alt="Unnamed Transceiver" style="width: 100%; border-radius: 8px; margin-bottom: 10px;">
+                <p><span style="color: white; font-family: 'Source Sans 3'; font-weight: 300;">Crest spawn region.</span></p>
+            `
+        },
+    ]
+
+    var resources = [
+
+        // interiors
+        {
+            id: "ductTape",
+            position: transCoord(4099,2225),
+            icon: poiIcons["resource"],
+            isSelected: false,
+            zoomThreshold: -0.5,
+            title: `<span style="color: white; font-family: 'Jura'; font-size: 24px; font-weight: normal;">Duct Tape</span>`,
+            content: `
+                <img src="images/icons/lol.png" alt="Duct Tape" style="width: 100%; border-radius: 8px; margin-bottom: 10px;">
+                <p><span style="color: white; font-family: 'Source Sans 3'; font-weight: 300;">Duct Tape.</span></p>
+            `
+        },
+        {
+            id: "ruggedSynthetics1",
+            position: transCoord(3875,2606),
+            icon: poiIcons["resource"],
+            isSelected: false,
+            zoomThreshold: -0.5,
+            title: `<span style="color: white; font-family: 'Jura'; font-size: 24px; font-weight: normal;">Rugged Synthetics</span>`,
+            content: `
+                <img src="images/icons/lol.png" alt="Rugged Synthetics" style="width: 100%; border-radius: 8px; margin-bottom: 10px;">
+                <p><span style="color: white; font-family: 'Source Sans 3'; font-weight: 300;">Rugged Synthetics.</span></p>
+            `
+        },
+        {
+            id: "ruggedSynthetics2",
+            position: transCoord(4305,1616),
+            icon: poiIcons["resource"],
+            isSelected: false,
+            zoomThreshold: -0.5,
+            title: `<span style="color: white; font-family: 'Jura'; font-size: 24px; font-weight: normal;">Rugged Synthetics</span>`,
+            content: `
+                <img src="images/icons/lol.png" alt="Rugged Synthetics" style="width: 100%; border-radius: 8px; margin-bottom: 10px;">
+                <p><span style="color: white; font-family: 'Source Sans 3'; font-weight: 300;">Rugged Synthetics.</span></p>
+            `
+        },
+        {
+            id: "ruggedSynthetics3",
+            position: transCoord(4609,3020),
+            icon: poiIcons["resource"],
+            isSelected: false,
+            zoomThreshold: -0.5,
+            title: `<span style="color: white; font-family: 'Jura'; font-size: 24px; font-weight: normal;">Rugged Synthetics</span>`,
+            content: `
+                <img src="images/icons/lol.png" alt="Rugged Synthetics" style="width: 100%; border-radius: 8px; margin-bottom: 10px;">
+                <p><span style="color: white; font-family: 'Source Sans 3'; font-weight: 300;">Rugged Synthetics.</span></p>
+            `
+        },
+        {
+            id: "slickwrap1",
+            position: transCoord(5080,2450),
+            icon: poiIcons["resource"],
+            isSelected: false,
+            zoomThreshold: -0.5,
+            title: `<span style="color: white; font-family: 'Jura'; font-size: 24px; font-weight: normal;">Slickwrap</span>`,
+            content: `
+                <img src="images/icons/lol.png" alt="Slickwrap" style="width: 100%; border-radius: 8px; margin-bottom: 10px;">
+                <p><span style="color: white; font-family: 'Source Sans 3'; font-weight: 300;">Slickwrap.</span></p>
+            `
+        },
+        {
+            id: "gripTape1",
+            position: transCoord(4167,2710),
+            icon: poiIcons["resource"],
+            isSelected: false,
+            zoomThreshold: -0.5,
+            title: `<span style="color: white; font-family: 'Jura'; font-size: 24px; font-weight: normal;">Grip Tape</span>`,
+            content: `
+                <img src="images/icons/lol.png" alt="Grip Tape" style="width: 100%; border-radius: 8px; margin-bottom: 10px;">
+                <p><span style="color: white; font-family: 'Source Sans 3'; font-weight: 300;">Grip Tape.</span></p>
+            `
+        },
+        {
+            id: "fittings1",
+            position: transCoord(3950,1825),
+            icon: poiIcons["resource"],
+            isSelected: false,
+            zoomThreshold: -0.5,
+            title: `<span style="color: white; font-family: 'Jura'; font-size: 24px; font-weight: normal;">Fittings</span>`,
+            content: `
+                <img src="images/icons/lol.png" alt="Fittings" style="width: 100%; border-radius: 8px; margin-bottom: 10px;">
+                <p><span style="color: white; font-family: 'Source Sans 3'; font-weight: 300;">Fittings.</span></p>
+            `
+        },
+        {
+            id: "nanotubeCable1",
+            position: transCoord(3027,2188),
+            icon: poiIcons["resource"],
+            isSelected: false,
+            zoomThreshold: -0.5,
+            title: `<span style="color: white; font-family: 'Jura'; font-size: 24px; font-weight: normal;">Nanotube Cable</span>`,
+            content: `
+                <img src="images/icons/lol.png" alt="Nanotube Cable" style="width: 100%; border-radius: 8px; margin-bottom: 10px;">
+                <p><span style="color: white; font-family: 'Source Sans 3'; font-weight: 300;">Nanotube Cable.</span></p>
+            `
+        },
+        {
+            id: "magnetizedAlloyHook",
+            position: transCoord(3053,4211),
+            icon: poiIcons["resource"],
+            isSelected: false,
+            zoomThreshold: -0.5,
+            title: `<span style="color: white; font-family: 'Jura'; font-size: 24px; font-weight: normal;">Magnetized Alloy Hook</span>`,
+            content: `
+                <img src="images/icons/lol.png" alt="Magnetized Alloy Hook" style="width: 100%; border-radius: 8px; margin-bottom: 10px;">
+                <p><span style="color: white; font-family: 'Source Sans 3'; font-weight: 300;">Magnetized Alloy Hook.</span></p>
+            `
+        },
+        {
+            id: "winchMount",
+            position: transCoord(2933,3465),
+            icon: poiIcons["resource"],
+            isSelected: false,
+            zoomThreshold: -0.5,
+            title: `<span style="color: white; font-family: 'Jura'; font-size: 24px; font-weight: normal;">Winch Mount</span>`,
+            content: `
+                <img src="images/icons/lol.png" alt="Winch Mount" style="width: 100%; border-radius: 8px; margin-bottom: 10px;">
+                <p><span style="color: white; font-family: 'Source Sans 3'; font-weight: 300;">Winch Mount.</span></p>
+            `
+        },
+        {
+            id: "microcapacitor",
+            position: transCoord(2826,3465),
+            icon: poiIcons["resource"],
+            isSelected: false,
+            zoomThreshold: -0.5,
+            title: `<span style="color: white; font-family: 'Jura'; font-size: 24px; font-weight: normal;">Microcapacitor</span>`,
+            content: `
+                <img src="images/icons/lol.png" alt="Microcapacitor" style="width: 100%; border-radius: 8px; margin-bottom: 10px;">
+                <p><span style="color: white; font-family: 'Source Sans 3'; font-weight: 300;">Microcapacitor.</span></p>
+            `
+        },
+        {
+            id: "emagAccelerator",
+            position: transCoord(5176,1795),
+            icon: poiIcons["resource"],
+            isSelected: false,
+            zoomThreshold: -0.5,
+            title: `<span style="color: white; font-family: 'Jura'; font-size: 24px; font-weight: normal;">EMAG Accelerator</span>`,
+            content: `
+                <img src="images/icons/lol.png" alt="EMAG Accelerator" style="width: 100%; border-radius: 8px; margin-bottom: 10px;">
+                <p><span style="color: white; font-family: 'Source Sans 3'; font-weight: 300;">EMAG Accelerator.</span></p>
+            `
+        },
+
+        //outside
+        {
+            id: "microPulseDriver",
+            position: transCoord(3158,4064),
+            icon: poiIcons["resource"],
+            isSelected: false,
+            zoomThreshold: -0.5,
+            title: `<span style="color: white; font-family: 'Jura'; font-size: 24px; font-weight: normal;">Micro Pulse Driver</span>`,
+            content: `
+                <img src="images/icons/lol.png" alt="Micro Pulse Driver" style="width: 100%; border-radius: 8px; margin-bottom: 10px;">
+                <p><span style="color: white; font-family: 'Source Sans 3'; font-weight: 300;">Micro Pulse Driver.</span></p>
+            `
+        },
+        {
+            id: "workGloves1",
+            position: transCoord(2991,2479),
+            icon: poiIcons["resource"],
+            isSelected: false,
+            zoomThreshold: -0.5,
+            title: `<span style="color: white; font-family: 'Jura'; font-size: 24px; font-weight: normal;">Work Gloves</span>`,
+            content: `
+                <img src="images/icons/lol.png" alt="Work Gloves" style="width: 100%; border-radius: 8px; margin-bottom: 10px;">
+                <p><span style="color: white; font-family: 'Source Sans 3'; font-weight: 300;">Work Gloves.</span></p>
+            `
+        },
+        {
+            id: "workGloves2",
+            position: transCoord(2827,4268),
+            icon: poiIcons["resource"],
+            isSelected: false,
+            zoomThreshold: -0.5,
+            title: `<span style="color: white; font-family: 'Jura'; font-size: 24px; font-weight: normal;">Work Gloves</span>`,
+            content: `
+                <img src="images/icons/lol.png" alt="Work Gloves" style="width: 100%; border-radius: 8px; margin-bottom: 10px;">
+                <p><span style="color: white; font-family: 'Source Sans 3'; font-weight: 300;">Work Gloves.</span></p>
+            `
+        },
+        {
+            id: "nanotubeCable2",
+            position: transCoord(2744,2023),
+            icon: poiIcons["resource"],
+            isSelected: false,
+            zoomThreshold: -0.5,
+            title: `<span style="color: white; font-family: 'Jura'; font-size: 24px; font-weight: normal;">Nanotube Cable</span>`,
+            content: `
+                <img src="images/icons/lol.png" alt="Nanotube Cable" style="width: 100%; border-radius: 8px; margin-bottom: 10px;">
+                <p><span style="color: white; font-family: 'Source Sans 3'; font-weight: 300;">Nanotube Cable.</span></p>
+            `
+        },
+        {
+            id: "slickwrap2",
+            position: transCoord(2543,1782),
+            icon: poiIcons["resource"],
+            isSelected: false,
+            zoomThreshold: -0.5,
+            title: `<span style="color: white; font-family: 'Jura'; font-size: 24px; font-weight: normal;">Slickwrap</span>`,
+            content: `
+                <img src="images/icons/lol.png" alt="Slickwrap" style="width: 100%; border-radius: 8px; margin-bottom: 10px;">
+                <p><span style="color: white; font-family: 'Source Sans 3'; font-weight: 300;">Slickwrap.</span></p>
+            `
+        },
+        {
+            id: "fittings2",
+            position: transCoord(4164,2042),
+            icon: poiIcons["resource"],
+            isSelected: false,
+            zoomThreshold: -0.5,
+            title: `<span style="color: white; font-family: 'Jura'; font-size: 24px; font-weight: normal;">Fittings</span>`,
+            content: `
+                <img src="images/icons/lol.png" alt="Fittings" style="width: 100%; border-radius: 8px; margin-bottom: 10px;">
+                <p><span style="color: white; font-family: 'Source Sans 3'; font-weight: 300;">Fittings.</span></p>
+            `
+        },
+        {
+            id: "gripTape2",
+            position: transCoord(3903,1582),
+            icon: poiIcons["resource"],
+            isSelected: false,
+            zoomThreshold: -0.5,
+            title: `<span style="color: white; font-family: 'Jura'; font-size: 24px; font-weight: normal;">Grip Tape</span>`,
+            content: `
+                <img src="images/icons/lol.png" alt="Grip Tape" style="width: 100%; border-radius: 8px; margin-bottom: 10px;">
+                <p><span style="color: white; font-family: 'Source Sans 3'; font-weight: 300;">Grip Tape.</span></p>
+            `
+        },
+        {
+            id: "staticFuseCable",
+            position: transCoord(4611,2909),
+            icon: poiIcons["resource"],
+            isSelected: false,
+            zoomThreshold: -0.5,
+            title: `<span style="color: white; font-family: 'Jura'; font-size: 24px; font-weight: normal;">Static Fuse Cable</span>`,
+            content: `
+                <img src="images/icons/lol.png" alt="Static Fuse Cable" style="width: 100%; border-radius: 8px; margin-bottom: 10px;">
+                <p><span style="color: white; font-family: 'Source Sans 3'; font-weight: 300;">Static Fuse Cable.</span></p>
+            `
+        },
+        
+    ]
+
     // define POIs with their positions and sidebar content
     var poi = [
 
@@ -2754,6 +4405,7 @@
         }
     ];
 
+
     // define labels
 
     var staticLabels = [
@@ -2817,7 +4469,7 @@
         },
         {
             id: "dirwikArtemisTower",
-            position: transCoord(2844,3466),
+            position: transCoord(2760,3466),
             typeIdentifier: '[staticLabel]',
             zoomThreshold: -2,
             name: "Artemis Tower Complex",
@@ -2857,7 +4509,7 @@
         },
         {
             id: "dirwikEntranceNorth",
-            position: transCoord(3293,1937),
+            position: transCoord(3293,1915),
             typeIdentifier: '[staticLabel]',
             zoomThreshold: -2,
             name: "Dirwik North Entrance",
@@ -3845,8 +5497,364 @@
     });
 
 
+    let routerStore = routers.map(router => {
+
+        let marker = L.marker(router.position, { icon: router.icon });
+
+        var firstTooltip = L.tooltip({
+            permanent: true,
+            direction: "top",   
+            offset: [0, -10],
+            opacity: 0.9,
+            className: "poi-tooltip"
+        })
+        .setContent(router.title).setLatLng(router.position);
+
+        var isWaitingUnrender=false;
+        var isForcedTransparent=false;
+        var isHoveringOnTooltip=false;
+        var isSelectionChanging=false;
+
+        const handleTooltipClick = (tooltip) => {
+            removeTooltipOpacity(tooltip);
+            isForcedTransparent=true;
+        };
+        const handleTooltipOnHover = (tooltip) => {
+            isHoveringOnTooltip=true;
+            if (!isForcedTransparent) {
+                removeTooltipOpacity(tooltip);
+            }
+        };
+        const handleTooltipOnLeave = (tooltip) => {
+            isHoveringOnTooltip=false;
+            if (!isForcedTransparent && !(!router.isSelected&&isWaitingUnrender)) { // holy cow this fixes the flickering thank heinz ketchup
+                restoreTooltipOpacity(tooltip);
+            }
+        };
+        const removeTooltipListeners = (tooltip) => {
+            tooltip._container.removeEventListener("click",handleTooltipClick);
+            tooltip._container.removeEventListener("mouseover",handleTooltipOnHover);
+            tooltip._container.removeEventListener("mouseout",handleTooltipOnLeave);
+        }
 
 
+        marker.on("mouseover", function() {
+            isWaitingUnrender=false;
+            if (!router.isSelected&&!isMobile) {
+                firstTooltip.setLatLng(marker.getLatLng());
+                map.addLayer(firstTooltip);
+
+                // handle tooltips
+                isForcedTransparent=false;
+                restoreTooltipOpacity(firstTooltip);
+                firstTooltip._container.addEventListener('click', () => handleTooltipClick(firstTooltip));
+                firstTooltip._container.addEventListener('mouseover', () => handleTooltipOnHover(firstTooltip));
+                firstTooltip._container.addEventListener('mouseout', () => handleTooltipOnLeave(firstTooltip));
+            }
+        });
+
+        // hide tooltips
+        marker.on("mouseout", function() {
+            isWaitingUnrender=true;
+            if (!router.isSelected) {
+
+                removeTooltipListeners(firstTooltip);
+                map.removeLayer(firstTooltip);
+            }
+        });
+
+        // trigger screen tooltip removal after deselection
+        document.addEventListener('click', function () {
+            if (isWaitingUnrender&&!router.isSelected){
+
+                removeTooltipListeners(firstTooltip);
+                map.removeLayer(firstTooltip);
+            }
+
+            if (router.isSelected&&isForcedTransparent&&!isHoveringOnTooltip) {
+                isForcedTransparent=false;                                    
+                restoreTooltipOpacity(firstTooltip);                                                
+            }
+        });
+
+
+        // Add click event to open sidebar
+        marker.on('click', function () {
+            //updateSelectedPOI({marker, id: router.id}, null, router);
+            //document.getElementById('sidebar-title').innerHTML = router.title;
+            //document.getElementById('sidebar-content').innerHTML = router.content;
+            
+            if (!isWaitingUnrender&&!router.isSelected&&isMobile) {
+                removeTooltipListeners(firstTooltip); 
+                map.removeLayer(firstTooltip);    
+            }
+
+            if (isMobile&&router.isSelected) {
+                firstTooltip.setLatLng(marker.getLatLng());
+                map.addLayer(firstTooltip);
+
+                // handle tooltips
+                isForcedTransparent=false;
+                restoreTooltipOpacity(firstTooltip);
+                firstTooltip._container.addEventListener('click', () => handleTooltipClick(firstTooltip));
+                firstTooltip._container.addEventListener('mouseover', () => handleTooltipOnHover(firstTooltip));
+                firstTooltip._container.addEventListener('mouseout', () => handleTooltipOnLeave(firstTooltip));
+            }
+        });
+
+        return {
+            data: router,
+            marker,
+            firstTooltip,
+            visible: false,
+            pendingRemoval: false,
+            layerType: 'routers',
+            isWaitingUnrender,
+            isForcedTransparent,
+            isHoveringOnTooltip,
+            isSelectionChanging
+        };
+    });
+
+
+    let transceiverStore = transceivers.map(transceiver => {
+
+        let marker = L.marker(transceiver.position, { icon: transceiver.icon });
+
+        var firstTooltip = L.tooltip({
+            permanent: true,
+            direction: "top",   
+            offset: [0, -10],
+            opacity: 0.9,
+            className: "poi-tooltip"
+        })
+        .setContent(transceiver.title).setLatLng(transceiver.position);
+
+        var isWaitingUnrender=false;
+        var isForcedTransparent=false;
+        var isHoveringOnTooltip=false;
+        var isSelectionChanging=false;
+
+        const handleTooltipClick = (tooltip) => {
+            removeTooltipOpacity(tooltip);
+            isForcedTransparent=true;
+        };
+        const handleTooltipOnHover = (tooltip) => {
+            isHoveringOnTooltip=true;
+            if (!isForcedTransparent) {
+                removeTooltipOpacity(tooltip);
+            }
+        };
+        const handleTooltipOnLeave = (tooltip) => {
+            isHoveringOnTooltip=false;
+            if (!isForcedTransparent && !(!transceiver.isSelected&&isWaitingUnrender)) { // holy cow this fixes the flickering thank heinz ketchup
+                restoreTooltipOpacity(tooltip);
+            }
+        };
+        const removeTooltipListeners = (tooltip) => {
+            tooltip._container.removeEventListener("click",handleTooltipClick);
+            tooltip._container.removeEventListener("mouseover",handleTooltipOnHover);
+            tooltip._container.removeEventListener("mouseout",handleTooltipOnLeave);
+        }
+
+
+        marker.on("mouseover", function() {
+            isWaitingUnrender=false;
+            if (!transceiver.isSelected&&!isMobile) {
+                firstTooltip.setLatLng(marker.getLatLng());
+                map.addLayer(firstTooltip);
+
+                // handle tooltips
+                isForcedTransparent=false;
+                restoreTooltipOpacity(firstTooltip);
+                firstTooltip._container.addEventListener('click', () => handleTooltipClick(firstTooltip));
+                firstTooltip._container.addEventListener('mouseover', () => handleTooltipOnHover(firstTooltip));
+                firstTooltip._container.addEventListener('mouseout', () => handleTooltipOnLeave(firstTooltip));
+            }
+        });
+
+        // hide tooltips
+        marker.on("mouseout", function() {
+            isWaitingUnrender=true;
+            if (!transceiver.isSelected) {
+
+                removeTooltipListeners(firstTooltip);
+                map.removeLayer(firstTooltip);
+            }
+        });
+
+        // trigger screen tooltip removal after deselection
+        document.addEventListener('click', function () {
+            if (isWaitingUnrender&&!transceiver.isSelected){
+
+                removeTooltipListeners(firstTooltip);
+                map.removeLayer(firstTooltip);
+            }
+
+            if (transceiver.isSelected&&isForcedTransparent&&!isHoveringOnTooltip) {
+                isForcedTransparent=false;                                    
+                restoreTooltipOpacity(firstTooltip);                                                
+            }
+        });
+
+
+        // Add click event to open sidebar
+        marker.on('click', function () {
+            updateSelectedPOI({marker, id: transceiver.id}, null, transceiver);
+            document.getElementById('sidebar-title').innerHTML = transceiver.title;
+            document.getElementById('sidebar-content').innerHTML = transceiver.content;
+            
+            if (!isWaitingUnrender&&!transceiver.isSelected&&isMobile) {
+                removeTooltipListeners(firstTooltip); 
+                map.removeLayer(firstTooltip);    
+            }
+
+            if (isMobile&&transceiver.isSelected) {
+                firstTooltip.setLatLng(marker.getLatLng());
+                map.addLayer(firstTooltip);
+
+                // handle tooltips
+                isForcedTransparent=false;
+                restoreTooltipOpacity(firstTooltip);
+                firstTooltip._container.addEventListener('click', () => handleTooltipClick(firstTooltip));
+                firstTooltip._container.addEventListener('mouseover', () => handleTooltipOnHover(firstTooltip));
+                firstTooltip._container.addEventListener('mouseout', () => handleTooltipOnLeave(firstTooltip));
+            }
+        });
+
+        return {
+            data: transceiver,
+            marker,
+            firstTooltip,
+            visible: false,
+            pendingRemoval: false,
+            layerType: 'transceivers',
+            isWaitingUnrender,
+            isForcedTransparent,
+            isHoveringOnTooltip,
+            isSelectionChanging
+        };
+    });
+
+
+    let resourceStore = resources.map(resource => {
+
+        let marker = L.marker(resource.position, { icon: resource.icon });
+
+        var firstTooltip = L.tooltip({
+            permanent: true,
+            direction: "top",   
+            offset: [0, -10],
+            opacity: 0.9,
+            className: "poi-tooltip"
+        })
+        .setContent(resource.title).setLatLng(resource.position);
+
+        var isWaitingUnrender=false;
+        var isForcedTransparent=false;
+        var isHoveringOnTooltip=false;
+        var isSelectionChanging=false;
+
+        const handleTooltipClick = (tooltip) => {
+            removeTooltipOpacity(tooltip);
+            isForcedTransparent=true;
+        };
+        const handleTooltipOnHover = (tooltip) => {
+            isHoveringOnTooltip=true;
+            if (!isForcedTransparent) {
+                removeTooltipOpacity(tooltip);
+            }
+        };
+        const handleTooltipOnLeave = (tooltip) => {
+            isHoveringOnTooltip=false;
+            if (!isForcedTransparent && !(!resource.isSelected&&isWaitingUnrender)) { // holy cow this fixes the flickering thank heinz ketchup
+                restoreTooltipOpacity(tooltip);
+            }
+        };
+        const removeTooltipListeners = (tooltip) => {
+            tooltip._container.removeEventListener("click",handleTooltipClick);
+            tooltip._container.removeEventListener("mouseover",handleTooltipOnHover);
+            tooltip._container.removeEventListener("mouseout",handleTooltipOnLeave);
+        }
+
+
+        marker.on("mouseover", function() {
+            isWaitingUnrender=false;
+            if (!resource.isSelected&&!isMobile) {
+                firstTooltip.setLatLng(marker.getLatLng());
+                map.addLayer(firstTooltip);
+
+                // handle tooltips
+                isForcedTransparent=false;
+                restoreTooltipOpacity(firstTooltip);
+                firstTooltip._container.addEventListener('click', () => handleTooltipClick(firstTooltip));
+                firstTooltip._container.addEventListener('mouseover', () => handleTooltipOnHover(firstTooltip));
+                firstTooltip._container.addEventListener('mouseout', () => handleTooltipOnLeave(firstTooltip));
+            }
+        });
+
+        // hide tooltips
+        marker.on("mouseout", function() {
+            isWaitingUnrender=true;
+            if (!resource.isSelected) {
+
+                removeTooltipListeners(firstTooltip);
+                map.removeLayer(firstTooltip);
+            }
+        });
+
+        // trigger screen tooltip removal after deselection
+        document.addEventListener('click', function () {
+            if (isWaitingUnrender&&!resource.isSelected){
+
+                removeTooltipListeners(firstTooltip);
+                map.removeLayer(firstTooltip);
+            }
+
+            if (resource.isSelected&&isForcedTransparent&&!isHoveringOnTooltip) {
+                isForcedTransparent=false;                                    
+                restoreTooltipOpacity(firstTooltip);                                                
+            }
+        });
+
+
+        // Add click event to open sidebar
+        marker.on('click', function () {
+            updateSelectedPOI({marker, id: resource.id}, null, resource);
+            document.getElementById('sidebar-title').innerHTML = resource.title;
+            document.getElementById('sidebar-content').innerHTML = resource.content;
+            
+            if (!isWaitingUnrender&&!resource.isSelected&&isMobile) {
+                removeTooltipListeners(firstTooltip); 
+                map.removeLayer(firstTooltip);    
+            }
+
+            if (isMobile&&resource.isSelected) {
+                firstTooltip.setLatLng(marker.getLatLng());
+                map.addLayer(firstTooltip);
+
+                // handle tooltips
+                isForcedTransparent=false;
+                restoreTooltipOpacity(firstTooltip);
+                firstTooltip._container.addEventListener('click', () => handleTooltipClick(firstTooltip));
+                firstTooltip._container.addEventListener('mouseover', () => handleTooltipOnHover(firstTooltip));
+                firstTooltip._container.addEventListener('mouseout', () => handleTooltipOnLeave(firstTooltip));
+            }
+        });
+
+        return {
+            data: resource,
+            marker,
+            firstTooltip,
+            visible: false,
+            pendingRemoval: false,
+            layerType: 'resources',
+            isWaitingUnrender,
+            isForcedTransparent,
+            isHoveringOnTooltip,
+            isSelectionChanging
+        };
+    });
 
     let poiStore = [];
     poi.forEach(poi => {
@@ -4295,7 +6303,7 @@
         
     });
 
-    map.getContainer().classList.remove('leaflet-fade-anim');
+    //map.getContainer().classList.remove('leaflet-fade-anim');
 
 
     superChangelog64();
